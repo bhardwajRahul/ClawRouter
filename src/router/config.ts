@@ -654,14 +654,21 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       ],
     },
     COMPLEX: {
-      primary: "google/gemini-2.5-pro",
-      fallback: ["xai/grok-4-0709", "openai/gpt-4o", "openai/gpt-5.2", "anthropic/claude-sonnet-4"], // Grok first for cost efficiency, Sonnet as last resort
+      primary: "google/gemini-3-pro-preview", // Latest Gemini - upgraded from 2.5
+      fallback: [
+        "google/gemini-2.5-pro",
+        "xai/grok-4-0709",
+        "openai/gpt-4o",
+        "openai/gpt-5.2",
+        "anthropic/claude-sonnet-4",
+      ],
     },
     REASONING: {
       primary: "xai/grok-4-1-fast-reasoning", // Upgraded Grok 4.1 reasoning $0.20/$0.50
       fallback: [
         "xai/grok-4-fast-reasoning",
-        "openai/o3", // Strong reasoning model
+        "openai/o3",
+        "openai/o4-mini", // Latest o-series mini
         "deepseek/deepseek-reasoner",
         "moonshot/kimi-k2.5",
       ],
@@ -699,12 +706,21 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       fallback: ["google/gemini-2.5-pro", "anthropic/claude-sonnet-4", "xai/grok-4-0709"],
     },
     COMPLEX: {
-      primary: "anthropic/claude-opus-4.5", // $15/$75
-      fallback: ["openai/gpt-5.2", "anthropic/claude-sonnet-4", "google/gemini-2.5-pro"],
+      primary: "anthropic/claude-opus-4.5", // $5/$25 - Latest Opus
+      fallback: [
+        "openai/gpt-5.2-pro", // $21/$168 - Latest GPT pro
+        "google/gemini-3-pro-preview", // Latest Gemini
+        "openai/gpt-5.2",
+        "anthropic/claude-sonnet-4",
+      ],
     },
     REASONING: {
-      primary: "openai/o3", // $10/$40
-      fallback: ["anthropic/claude-opus-4.5", "openai/o1", "google/gemini-2.5-pro"],
+      primary: "openai/o3", // $2/$8 - Best value reasoning
+      fallback: [
+        "openai/o4-mini", // Latest o-series
+        "anthropic/claude-opus-4.5",
+        "google/gemini-3-pro-preview",
+      ],
     },
   },
 
@@ -724,11 +740,21 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     },
     COMPLEX: {
       primary: "anthropic/claude-sonnet-4",
-      fallback: ["anthropic/claude-opus-4.5", "openai/gpt-5.2", "xai/grok-4-0709"], // Opus 4.5 is 3x cheaper than Opus 4
+      fallback: [
+        "anthropic/claude-opus-4.5", // Latest Opus - best agentic
+        "openai/gpt-5.2",
+        "google/gemini-3-pro-preview",
+        "xai/grok-4-0709",
+      ],
     },
     REASONING: {
       primary: "anthropic/claude-sonnet-4", // Strong tool use + reasoning for agentic tasks
-      fallback: ["xai/grok-4-fast-reasoning", "moonshot/kimi-k2.5", "deepseek/deepseek-reasoner"],
+      fallback: [
+        "anthropic/claude-opus-4.5",
+        "xai/grok-4-fast-reasoning",
+        "moonshot/kimi-k2.5",
+        "deepseek/deepseek-reasoner",
+      ],
     },
   },
 

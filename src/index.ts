@@ -233,11 +233,8 @@ function injectModelsConfig(logger: { info: (msg: string) => void }): void {
     { id: "sonnet", alias: "sonnet" },
     { id: "opus", alias: "opus" },
     { id: "haiku", alias: "haiku" },
-    { id: "gpt", alias: "gpt" },
     { id: "gpt5", alias: "gpt5" },
     { id: "mini", alias: "mini" },
-    { id: "o3", alias: "o3" },
-    { id: "grok", alias: "grok" },
     { id: "grok-fast", alias: "grok-fast" },
     { id: "grok-code", alias: "grok-code" },
     { id: "deepseek", alias: "deepseek" },
@@ -245,7 +242,6 @@ function injectModelsConfig(logger: { info: (msg: string) => void }): void {
     { id: "kimi", alias: "kimi" },
     { id: "gemini", alias: "gemini" },
     { id: "flash", alias: "flash" },
-    { id: "nvidia", alias: "nvidia" },
   ];
 
   if (!defaults.models) {
