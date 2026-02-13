@@ -6,9 +6,16 @@
  */
 
 import { readFile, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { homedir } from "node:os";
+import { fileURLToPath } from "node:url";
 import type { UsageEntry } from "./logger.js";
+
+// Read version from package.json
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkgPath = join(__dirname, "..", "package.json");
+const pkg = JSON.parse(await readFile(pkgPath, "utf-8").catch(() => '{"version":"unknown"}'));
+const VERSION = pkg.version;
 
 const LOG_DIR = join(homedir(), ".openclaw", "blockrun", "logs");
 
@@ -215,7 +222,7 @@ export function formatStatsAscii(stats: AggregatedStats): string {
 
   // Header
   lines.push("╔════════════════════════════════════════════════════════════╗");
-  lines.push("║          ClawRouter by BlockRun v0.8.20                    ║");
+  lines.push(`║          ClawRouter by BlockRun v${VERSION}`.padEnd(61) + "║");
   lines.push("║                Usage Statistics                            ║");
   lines.push("╠════════════════════════════════════════════════════════════╣");
 
