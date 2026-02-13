@@ -30,6 +30,7 @@ _The world's first hackathon run entirely by AI agents, powered by USDC_
 
 ## Why ClawRouter?
 
+- **4 routing profiles** — auto (balanced), eco (95.9-100% savings), premium (best quality), free (zero cost)
 - **100% local routing** — 15-dimension weighted scoring runs on your machine in <1ms
 - **Zero external calls** — no API calls for routing decisions, ever
 - **30+ models** — OpenAI, Anthropic, Google, DeepSeek, xAI, Moonshot through one wallet
@@ -73,13 +74,21 @@ Done! Smart routing (`blockrun/auto`) is now your default model.
 
 **For advanced users:** See the [complete manual installation guide](docs/windows-installation.md) with step-by-step PowerShell instructions.
 
-### Tips
+### Routing Profiles
 
-- **Use `/model blockrun/auto`** in any conversation to switch on the fly
-- **Free tier?** Use `/model free` — routes to gpt-oss-120b at $0
-- **Model aliases:** `/model sonnet`, `/model grok`, `/model deepseek`, `/model kimi`
-- **Want a specific model?** Use `blockrun/openai/gpt-4o` or `blockrun/anthropic/claude-sonnet-4`
-- **Already have a funded wallet?** `export BLOCKRUN_WALLET_KEY=0x...`
+Choose your routing strategy with `/model <profile>`:
+
+| Profile | Strategy | Savings | Use Case |
+|---------|----------|---------|----------|
+| `/model auto` | Balanced (default) | 74-100% | Best overall balance |
+| `/model eco` | Cost optimized | 95.9-100% | Maximum savings |
+| `/model premium` | Quality focused | 0% | Best quality (Opus 4.5) |
+| `/model free` | Free tier only | 100% | Zero cost |
+
+**Other shortcuts:**
+- **Model aliases:** `/model sonnet`, `/model grok`, `/model gpt5`, `/model o3`
+- **Specific models:** `blockrun/openai/gpt-4o` or `blockrun/anthropic/claude-sonnet-4`
+- **Bring your wallet:** `export BLOCKRUN_WALLET_KEY=0x...`
 
 ---
 
@@ -115,6 +124,27 @@ Request → Weighted Scorer (15 dimensions)
 No external classifier calls. Ambiguous queries default to the MEDIUM tier (Grok Code Fast) — fast, cheap, and good enough for most tasks.
 
 **Deep dive:** [15-dimension scoring weights](docs/configuration.md#scoring-weights) | [Architecture](docs/architecture.md)
+
+### Routing Profiles (NEW in v0.8.21)
+
+ClawRouter now offers 4 routing profiles to match different priorities:
+
+| Profile | Strategy | Savings vs Opus 4.5 | When to Use |
+|---------|----------|---------------------|-------------|
+| **auto** (default) | Balanced quality + cost | 74-100% | General use, best overall |
+| **eco** | Maximum cost savings | 95.9-100% | Budget-conscious, high volume |
+| **premium** | Best quality only | 0% | Mission-critical tasks |
+| **free** | Free tier only | 100% | Testing, empty wallet |
+
+Switch profiles anytime: `/model eco`, `/model premium`, `/model auto`
+
+**Example:**
+```
+/model eco                    # Switch to cost-optimized routing
+"Write a React component"     # Routes to DeepSeek ($0.28/$0.42)
+                              # vs Auto → Grok ($0.20/$1.50)
+                              # 98.3% savings vs Opus 4.5
+```
 
 ### Tier → Model Mapping
 
