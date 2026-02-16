@@ -5,10 +5,21 @@
  * while preserving semantic meaning for LLM queries.
  */
 
+// Content part for multimodal messages (images, etc.)
+export interface ContentPart {
+  type: "text" | "image_url";
+  text?: string;
+  image_url?: {
+    url: string;
+    detail?: "low" | "high" | "auto";
+  };
+}
+
 // Normalized message structure (matches OpenAI format)
+// Note: content can be an array for multimodal messages (images, etc.)
 export interface NormalizedMessage {
   role: "system" | "user" | "assistant" | "tool";
-  content: string | null;
+  content: string | ContentPart[] | null;
   tool_call_id?: string;
   tool_calls?: ToolCall[];
   name?: string;

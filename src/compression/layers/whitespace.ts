@@ -23,7 +23,8 @@ export interface WhitespaceResult {
  * - Trim start/end
  */
 export function normalizeWhitespace(content: string): string {
-  if (!content) return content;
+  // Defensive type check - content might be array/object for multimodal messages
+  if (!content || typeof content !== "string") return content as string;
 
   return (
     content

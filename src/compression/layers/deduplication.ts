@@ -22,12 +22,15 @@ export interface DeduplicationResult {
  * Uses role + content + tool_call_id to identify duplicates.
  */
 function hashMessage(message: NormalizedMessage): string {
-  const parts = [
-    message.role,
-    message.content || "",
-    message.tool_call_id || "",
-    message.name || "",
-  ];
+  // Handle content - stringify arrays (multimodal), use string directly, or empty string
+  let contentStr = "";
+  if (typeof message.content === "string") {
+    contentStr = message.content;
+  } else if (Array.isArray(message.content)) {
+    contentStr = JSON.stringify(message.content);
+  }
+
+  const parts = [message.role, contentStr, message.tool_call_id || "", message.name || ""];
 
   // Include tool_calls if present
   if (message.tool_calls) {

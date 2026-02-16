@@ -99,6 +99,8 @@ function buildDynamicCodebook(messages: NormalizedMessage[]): Record<string, str
  * Escape special regex characters.
  */
 function escapeRegex(str: string): string {
+  // Defensive type check
+  if (!str || typeof str !== "string") return "";
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 

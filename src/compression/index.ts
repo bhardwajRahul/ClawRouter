@@ -34,7 +34,13 @@ export { STATIC_CODEBOOK } from "./codebook";
  */
 function calculateTotalChars(messages: NormalizedMessage[]): number {
   return messages.reduce((total, msg) => {
-    let chars = msg.content?.length || 0;
+    let chars = 0;
+    if (typeof msg.content === "string") {
+      chars = msg.content.length;
+    } else if (Array.isArray(msg.content)) {
+      // For multimodal content, stringify to get approximate size
+      chars = JSON.stringify(msg.content).length;
+    }
     if (msg.tool_calls) {
       chars += JSON.stringify(msg.tool_calls).length;
     }
@@ -73,13 +79,18 @@ function prependCodebookHeader(
     return [{ role: "system", content: header }, ...messages];
   }
 
-  // Prepend to first user message
+  // Prepend to first user message (only if content is a string)
   return messages.map((msg, i) => {
     if (i === userIndex) {
-      return {
-        ...msg,
-        content: `${header}\n\n${msg.content || ""}`,
-      };
+      // Only prepend to string content - skip arrays (multimodal messages)
+      if (typeof msg.content === "string") {
+        return {
+          ...msg,
+          content: `${header}\n\n${msg.content}`,
+        };
+      }
+      // For non-string content, don't modify the message
+      // The codebook header would corrupt array content
     }
     return msg;
   });
@@ -227,10 +238,11 @@ export async function compressContext(
       const dynHeader = generateDynamicCodebookHeader(dynamicCodes);
       if (dynHeader) {
         const systemIndex = result.findIndex((m) => m.role === "system");
-        if (systemIndex >= 0) {
+        // Only prepend to string content - skip arrays (multimodal messages)
+        if (systemIndex >= 0 && typeof result[systemIndex].content === "string") {
           result[systemIndex] = {
             ...result[systemIndex],
-            content: `${dynHeader}\n${result[systemIndex].content || ""}`,
+            content: `${dynHeader}\n${result[systemIndex].content}`,
           };
         }
       }

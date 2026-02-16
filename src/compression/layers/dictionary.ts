@@ -26,6 +26,10 @@ function encodeContent(
   content: string,
   inverseCodebook: Record<string, string>,
 ): { encoded: string; substitutions: number; codes: Set<string>; charsSaved: number } {
+  // Defensive type check - content might be array/object for multimodal messages
+  if (!content || typeof content !== "string") {
+    return { encoded: content, substitutions: 0, codes: new Set(), charsSaved: 0 };
+  }
   let encoded = content;
   let substitutions = 0;
   let charsSaved = 0;
