@@ -15,13 +15,18 @@ import type { ModelDefinitionConfig, ModelProviderConfig } from "./types.js";
  * Users can type `/model claude` instead of `/model blockrun/anthropic/claude-sonnet-4`.
  */
 export const MODEL_ALIASES: Record<string, string> = {
-  // Claude
+  // Claude - short names
   claude: "anthropic/claude-sonnet-4",
   sonnet: "anthropic/claude-sonnet-4",
   opus: "anthropic/claude-opus-4.6", // Updated to latest Opus 4.6
   "opus-46": "anthropic/claude-opus-4.6",
   "opus-45": "anthropic/claude-opus-4.5",
   haiku: "anthropic/claude-haiku-4.5",
+  // Claude - provider/shortname patterns (common in agent frameworks)
+  "anthropic/sonnet": "anthropic/claude-sonnet-4",
+  "anthropic/opus": "anthropic/claude-opus-4.6",
+  "anthropic/haiku": "anthropic/claude-haiku-4.5",
+  "anthropic/claude": "anthropic/claude-sonnet-4",
 
   // OpenAI
   gpt: "openai/gpt-4o",
