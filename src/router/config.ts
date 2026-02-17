@@ -712,9 +712,9 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     COMPLEX: {
       primary: "anthropic/claude-opus-4.6", // Best quality for complex tasks
       fallback: [
+        "openai/gpt-5.2-codex",
         "anthropic/claude-opus-4.5",
         "anthropic/claude-sonnet-4",
-        "openai/gpt-5.2-codex",
         "google/gemini-3-pro-preview",
         "moonshot/kimi-k2.5",
       ],
