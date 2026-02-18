@@ -663,7 +663,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
         "xai/grok-4-0709",
         "openai/gpt-5.2", // Newer and cheaper input than gpt-4o
         "openai/gpt-4o",
-        "anthropic/claude-sonnet-4-6",
+        "claude-sonnet-4",
       ],
     },
     REASONING: {
@@ -717,7 +717,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   premiumTiers: {
     SIMPLE: {
       primary: "moonshot/kimi-k2.5", // $0.50/$2.40 - good for simple coding
-      fallback: ["anthropic/claude-haiku-4-5", "google/gemini-2.5-flash", "xai/grok-code-fast-1"],
+      fallback: ["claude-haiku-4.5", "google/gemini-2.5-flash", "xai/grok-code-fast-1"],
     },
     MEDIUM: {
       primary: "openai/gpt-5.2-codex", // $2.50/$10 - strong coding for medium tasks
@@ -725,24 +725,24 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
         "moonshot/kimi-k2.5",
         "google/gemini-2.5-pro",
         "xai/grok-4-0709",
-        "anthropic/claude-sonnet-4-6",
+        "claude-sonnet-4",
       ],
     },
     COMPLEX: {
-      primary: "anthropic/claude-opus-4-6", // Best quality for complex tasks
+      primary: "claude-opus-4", // Best quality for complex tasks
       fallback: [
         "openai/gpt-5.2-codex",
-        "anthropic/claude-opus-4-5",
-        "anthropic/claude-sonnet-4-6",
+        "claude-opus-4",
+        "claude-sonnet-4",
         "google/gemini-3-pro-preview",
         "moonshot/kimi-k2.5",
       ],
     },
     REASONING: {
-      primary: "anthropic/claude-sonnet-4-6", // $3/$15 - best for reasoning/instructions
+      primary: "claude-sonnet-4", // $3/$15 - best for reasoning/instructions
       fallback: [
-        "anthropic/claude-opus-4-6",
-        "anthropic/claude-opus-4-5",
+        "claude-opus-4",
+        "claude-opus-4",
         "openai/o4-mini", // Newer and cheaper than o3 ($1.10 vs $2.00)
         "openai/o3",
         "xai/grok-4-1-fast-reasoning",
@@ -756,7 +756,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       primary: "moonshot/kimi-k2.5", // Cheaper than Haiku ($0.5/$2.4 vs $1/$5), larger context
       fallback: [
         "minimax/minimax-m2.5", // $0.30/$1.20 - agentic capable, cheaper than kimi
-        "anthropic/claude-haiku-4-5",
+        "claude-haiku-4.5",
         "xai/grok-4-1-fast-non-reasoning",
         "openai/gpt-4o-mini",
       ],
@@ -766,14 +766,14 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       fallback: [
         "minimax/minimax-m2.5", // $0.30/$1.20 - agentic capable
         "moonshot/kimi-k2.5",
-        "anthropic/claude-haiku-4-5",
-        "anthropic/claude-sonnet-4-6",
+        "claude-haiku-4.5",
+        "claude-sonnet-4",
       ],
     },
     COMPLEX: {
-      primary: "anthropic/claude-sonnet-4-6",
+      primary: "claude-sonnet-4",
       fallback: [
-        "anthropic/claude-opus-4-6", // Latest Opus - best agentic
+        "claude-opus-4", // Latest Opus - best agentic
         "minimax/minimax-m2.5", // $0.30/$1.20 - cheap agentic fallback
         "openai/gpt-5.2",
         "google/gemini-3-pro-preview",
@@ -781,9 +781,9 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       ],
     },
     REASONING: {
-      primary: "anthropic/claude-sonnet-4-6", // Strong tool use + reasoning for agentic tasks
+      primary: "claude-sonnet-4", // Strong tool use + reasoning for agentic tasks
       fallback: [
-        "anthropic/claude-opus-4-6",
+        "claude-opus-4",
         "minimax/minimax-m2.5", // $0.30/$1.20 - reasoning + agentic
         "xai/grok-4-1-fast-reasoning",
         "deepseek/deepseek-reasoner",

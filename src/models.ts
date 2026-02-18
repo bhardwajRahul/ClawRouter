@@ -15,27 +15,27 @@ import type { ModelDefinitionConfig, ModelProviderConfig } from "./types.js";
  * Users can type `/model claude` instead of `/model blockrun/anthropic/claude-sonnet-4-6`.
  */
 export const MODEL_ALIASES: Record<string, string> = {
-  // Claude - short names (use dashes in version, not dots - Anthropic API format)
-  claude: "anthropic/claude-sonnet-4-6",
-  sonnet: "anthropic/claude-sonnet-4-6",
-  opus: "anthropic/claude-opus-4-6",
-  "opus-46": "anthropic/claude-opus-4-6",
-  "opus-45": "anthropic/claude-opus-4-5",
-  haiku: "anthropic/claude-haiku-4-5",
+  // Claude - short names (backend uses bare model names without anthropic/ prefix)
+  claude: "claude-sonnet-4",
+  sonnet: "claude-sonnet-4",
+  opus: "claude-opus-4",
+  "opus-4": "claude-opus-4",
+  haiku: "claude-haiku-4.5",
   // Claude - provider/shortname patterns (common in agent frameworks)
-  "anthropic/sonnet": "anthropic/claude-sonnet-4-6",
-  "anthropic/opus": "anthropic/claude-opus-4-6",
-  "anthropic/haiku": "anthropic/claude-haiku-4-5",
-  "anthropic/claude": "anthropic/claude-sonnet-4-6",
-  // Backward compatibility - old dot notation still works
-  "anthropic/claude-sonnet-4.6": "anthropic/claude-sonnet-4-6",
-  "anthropic/claude-opus-4.6": "anthropic/claude-opus-4-6",
-  "anthropic/claude-opus-4.5": "anthropic/claude-opus-4-5",
-  "anthropic/claude-haiku-4.5": "anthropic/claude-haiku-4-5",
-  // Base model names without version -> route to latest
-  "anthropic/claude-sonnet-4": "anthropic/claude-sonnet-4-6",
-  "anthropic/claude-opus-4": "anthropic/claude-opus-4-6",
-  "anthropic/claude-haiku-4": "anthropic/claude-haiku-4-5",
+  "anthropic/sonnet": "claude-sonnet-4",
+  "anthropic/opus": "claude-opus-4",
+  "anthropic/haiku": "claude-haiku-4.5",
+  "anthropic/claude": "claude-sonnet-4",
+  // Backward compatibility - various formats all route to backend names
+  "anthropic/claude-sonnet-4": "claude-sonnet-4",
+  "anthropic/claude-sonnet-4-6": "claude-sonnet-4",
+  "anthropic/claude-sonnet-4.6": "claude-sonnet-4",
+  "anthropic/claude-opus-4": "claude-opus-4",
+  "anthropic/claude-opus-4-6": "claude-opus-4",
+  "anthropic/claude-opus-4.6": "claude-opus-4",
+  "anthropic/claude-haiku-4": "claude-haiku-4.5",
+  "anthropic/claude-haiku-4-5": "claude-haiku-4.5",
+  "anthropic/claude-haiku-4.5": "claude-haiku-4.5",
 
   // OpenAI
   gpt: "openai/gpt-4o",
@@ -270,8 +270,9 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   },
 
   // Anthropic - all Claude models excel at agentic workflows
+  // Backend uses bare model names (claude-sonnet-4, not anthropic/claude-sonnet-4-6)
   {
-    id: "anthropic/claude-haiku-4-5",
+    id: "claude-haiku-4.5",
     name: "Claude Haiku 4.5",
     inputPrice: 1.0,
     outputPrice: 5.0,
@@ -280,8 +281,8 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     agentic: true,
   },
   {
-    id: "anthropic/claude-sonnet-4-6",
-    name: "Claude Sonnet 4.6",
+    id: "claude-sonnet-4",
+    name: "Claude Sonnet 4",
     inputPrice: 3.0,
     outputPrice: 15.0,
     contextWindow: 200000,
@@ -290,34 +291,13 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     agentic: true,
   },
   {
-    id: "anthropic/claude-opus-4",
+    id: "claude-opus-4",
     name: "Claude Opus 4",
     inputPrice: 15.0,
     outputPrice: 75.0,
     contextWindow: 200000,
     maxOutput: 32000,
     reasoning: true,
-    agentic: true,
-  },
-  {
-    id: "anthropic/claude-opus-4-5",
-    name: "Claude Opus 4.5",
-    inputPrice: 5.0,
-    outputPrice: 25.0,
-    contextWindow: 200000,
-    maxOutput: 32000,
-    reasoning: true,
-    agentic: true,
-  },
-  {
-    id: "anthropic/claude-opus-4-6",
-    name: "Claude Opus 4.6",
-    inputPrice: 5.0,
-    outputPrice: 25.0,
-    contextWindow: 200000,
-    maxOutput: 64000,
-    reasoning: true,
-    vision: true,
     agentic: true,
   },
 
