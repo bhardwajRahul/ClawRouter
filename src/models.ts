@@ -56,6 +56,9 @@ export const MODEL_ALIASES: Record<string, string> = {
   nvidia: "nvidia/gpt-oss-120b",
   "gpt-120b": "nvidia/gpt-oss-120b",
 
+  // MiniMax
+  minimax: "minimax/minimax-m2.5",
+
   // Note: auto, free, eco, premium are virtual routing profiles registered in BLOCKRUN_MODELS
   // They don't need aliases since they're already top-level model IDs
 };
@@ -441,6 +444,18 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     reasoning: true,
   },
   // grok-2-vision removed - old, 0 transactions
+
+  // MiniMax
+  {
+    id: "minimax/minimax-m2.5",
+    name: "MiniMax M2.5",
+    inputPrice: 0.3,
+    outputPrice: 1.2,
+    contextWindow: 204800,
+    maxOutput: 16384,
+    reasoning: true,
+    agentic: true,
+  },
 
   // NVIDIA - Free/cheap models
   {
