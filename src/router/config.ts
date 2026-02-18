@@ -708,10 +708,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     },
     REASONING: {
       primary: "minimax/minimax-m2.5", // $0.30/$1.20 - cheapest reasoning model
-      fallback: [
-        "deepseek/deepseek-reasoner",
-        "xai/grok-4-1-fast-reasoning",
-      ],
+      fallback: ["deepseek/deepseek-reasoner", "xai/grok-4-1-fast-reasoning"],
     },
   },
 

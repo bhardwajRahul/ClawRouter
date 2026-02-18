@@ -114,12 +114,12 @@ ClawRouter automatically detects multi-step agentic tasks and routes to models o
 
 **Agentic tier models** (optimized for multi-step autonomy):
 
-| Tier      | Agentic Model    | Why                            |
-| --------- | ---------------- | ------------------------------ |
-| SIMPLE    | claude-haiku-4.5 | Fast + reliable tool use       |
-| MEDIUM    | kimi-k2.5        | 200+ tool chains, 76% cheaper  |
-| COMPLEX   | claude-sonnet-4.6  | Best balance for complex tasks |
-| REASONING | kimi-k2.5        | Extended reasoning + execution |
+| Tier      | Agentic Model     | Why                            |
+| --------- | ----------------- | ------------------------------ |
+| SIMPLE    | claude-haiku-4.5  | Fast + reliable tool use       |
+| MEDIUM    | kimi-k2.5         | 200+ tool chains, 76% cheaper  |
+| COMPLEX   | claude-sonnet-4.6 | Best balance for complex tasks |
+| REASONING | kimi-k2.5         | Extended reasoning + execution |
 
 ### Force Agentic Mode
 

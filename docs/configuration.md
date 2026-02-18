@@ -317,12 +317,12 @@ plugins:
 
 ### Default Tier Mappings
 
-| Tier      | Primary Model                | Fallback Chain                                  |
-| --------- | ---------------------------- | ----------------------------------------------- |
-| SIMPLE    | `google/gemini-2.5-flash`    | `deepseek/deepseek-chat`                        |
-| MEDIUM    | `deepseek/deepseek-chat`     | `openai/gpt-4o-mini`, `google/gemini-2.5-flash` |
-| COMPLEX   | `anthropic/claude-sonnet-4.6`  | `openai/gpt-4o`, `google/gemini-2.5-pro`        |
-| REASONING | `deepseek/deepseek-reasoner` | `openai/o3-mini`, `anthropic/claude-sonnet-4.6`   |
+| Tier      | Primary Model                 | Fallback Chain                                  |
+| --------- | ----------------------------- | ----------------------------------------------- |
+| SIMPLE    | `google/gemini-2.5-flash`     | `deepseek/deepseek-chat`                        |
+| MEDIUM    | `deepseek/deepseek-chat`      | `openai/gpt-4o-mini`, `google/gemini-2.5-flash` |
+| COMPLEX   | `anthropic/claude-sonnet-4.6` | `openai/gpt-4o`, `google/gemini-2.5-pro`        |
+| REASONING | `deepseek/deepseek-reasoner`  | `openai/o3-mini`, `anthropic/claude-sonnet-4.6` |
 
 ### Fallback Chain
 
