@@ -33,17 +33,17 @@ One wallet, 30+ models, zero API keys.
 
 ## 📑 Quick Navigation
 
-| Section | Description |
-|---------|-------------|
-| [Quick Start](#-quick-start) | Install in 2 minutes |
-| [Routing Profiles](#-routing-profiles) | eco / auto / premium / free |
-| [How It Works](#-how-it-works) | 15-dimension local routing |
-| [Models & Pricing](#-models--pricing) | 30+ models, full price list |
-| [Screenshots](#-screenshots) | See it in action |
-| [Payment](#-payment) | x402 non-custodial USDC |
-| [Configuration](#%EF%B8%8F-configuration) | Environment variables |
-| [vs OpenRouter](#-vs-openrouter) | Why ClawRouter wins |
-| [Support](#-support) | Telegram, X, founders |
+| Section                                   | Description                 |
+| ----------------------------------------- | --------------------------- |
+| [Quick Start](#-quick-start)              | Install in 2 minutes        |
+| [Routing Profiles](#-routing-profiles)    | eco / auto / premium / free |
+| [How It Works](#-how-it-works)            | 15-dimension local routing  |
+| [Models & Pricing](#-models--pricing)     | 30+ models, full price list |
+| [Screenshots](#-screenshots)              | See it in action            |
+| [Payment](#-payment)                      | x402 non-custodial USDC     |
+| [Configuration](#%EF%B8%8F-configuration) | Environment variables       |
+| [vs OpenRouter](#-vs-openrouter)          | Why ClawRouter wins         |
+| [Support](#-support)                      | Telegram, X, founders       |
 
 ---
 
@@ -66,12 +66,12 @@ Done! Smart routing (`blockrun/auto`) is now your default model.
 
 Choose your routing strategy with `/model <profile>`:
 
-| Profile | Strategy | Savings | Best For |
-|---------|----------|---------|----------|
-| `/model auto` | Balanced (default) | 74-100% | General use |
-| `/model eco` | Cheapest possible | 95-100% | Maximum savings |
-| `/model premium` | Best quality | 0% | Mission-critical |
-| `/model free` | Free tier only | 100% | Zero cost |
+| Profile          | Strategy           | Savings | Best For         |
+| ---------------- | ------------------ | ------- | ---------------- |
+| `/model auto`    | Balanced (default) | 74-100% | General use      |
+| `/model eco`     | Cheapest possible  | 95-100% | Maximum savings  |
+| `/model premium` | Best quality       | 0%      | Mission-critical |
+| `/model free`    | Free tier only     | 100%    | Zero cost        |
 
 **Shortcuts:** `/model grok`, `/model br-sonnet`, `/model gpt5`, `/model o3`
 
@@ -85,12 +85,12 @@ Choose your routing strategy with `/model <profile>`:
 Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Response
 ```
 
-| Tier | ECO Model | AUTO Model | PREMIUM Model |
-|------|-----------|------------|---------------|
-| SIMPLE | nvidia/gpt-oss-120b (FREE) | kimi-k2.5 ($0.50/$2.40) | kimi-k2.5 |
-| MEDIUM | gemini-2.5-flash ($0.15/$0.60) | grok-code-fast ($0.20/$1.50) | gpt-5.2-codex ($2.50/$10) |
-| COMPLEX | gemini-2.5-flash ($0.15/$0.60) | gemini-3-pro ($2/$12) | claude-opus-4 ($15/$75) |
-| REASONING | grok-4-fast ($0.20/$0.50) | grok-4-fast ($0.20/$0.50) | claude-sonnet-4 ($3/$15) |
+| Tier      | ECO Model                      | AUTO Model                   | PREMIUM Model             |
+| --------- | ------------------------------ | ---------------------------- | ------------------------- |
+| SIMPLE    | nvidia/gpt-oss-120b (FREE)     | kimi-k2.5 ($0.50/$2.40)      | kimi-k2.5                 |
+| MEDIUM    | gemini-2.5-flash ($0.15/$0.60) | grok-code-fast ($0.20/$1.50) | gpt-5.2-codex ($2.50/$10) |
+| COMPLEX   | gemini-2.5-flash ($0.15/$0.60) | gemini-3-pro ($2/$12)        | claude-opus-4 ($15/$75)   |
+| REASONING | grok-4-fast ($0.20/$0.50)      | grok-4-fast ($0.20/$0.50)    | claude-sonnet-4 ($3/$15)  |
 
 **Blended average: $2.05/M** vs $25/M for Claude Opus = **92% savings**
 
@@ -103,34 +103,34 @@ Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Resp
 <details>
 <summary><strong>Click to expand full model list</strong></summary>
 
-| Model | Input $/M | Output $/M | Context | Reasoning |
-|-------|-----------|------------|---------|:---------:|
-| **OpenAI** |||||
-| gpt-5.2 | $1.75 | $14.00 | 400K | * |
-| gpt-4o | $2.50 | $10.00 | 128K | |
-| gpt-4o-mini | $0.15 | $0.60 | 128K | |
-| gpt-oss-120b | **FREE** | **FREE** | 128K | |
-| o3 | $2.00 | $8.00 | 200K | * |
-| o4-mini | $1.10 | $4.40 | 128K | * |
-| **Anthropic** |||||
-| claude-opus-4.5 | $5.00 | $25.00 | 200K | * |
-| claude-sonnet-4.6 | $3.00 | $15.00 | 200K | * |
-| claude-haiku-4.5 | $1.00 | $5.00 | 200K | |
-| **Google** |||||
-| gemini-3-pro-preview | $2.00 | $12.00 | 1M | * |
-| gemini-2.5-pro | $1.25 | $10.00 | 1M | * |
-| gemini-2.5-flash | $0.15 | $0.60 | 1M | |
-| **DeepSeek** |||||
-| deepseek-chat | $0.14 | $0.28 | 128K | |
-| deepseek-reasoner | $0.55 | $2.19 | 128K | * |
-| **xAI** |||||
-| grok-4-0709 | $0.20 | $1.50 | 131K | * |
-| grok-4-1-fast-reasoning | $0.20 | $0.50 | 131K | * |
-| grok-code-fast-1 | $0.20 | $1.50 | 131K | |
-| **Moonshot** |||||
-| kimi-k2.5 | $0.50 | $2.40 | 262K | * |
-| **MiniMax** |||||
-| minimax-m2.5 | $0.30 | $1.20 | 205K | * |
+| Model                   | Input $/M | Output $/M | Context | Reasoning |
+| ----------------------- | --------- | ---------- | ------- | :-------: |
+| **OpenAI**              |           |            |         |           |
+| gpt-5.2                 | $1.75     | $14.00     | 400K    |    \*     |
+| gpt-4o                  | $2.50     | $10.00     | 128K    |           |
+| gpt-4o-mini             | $0.15     | $0.60      | 128K    |           |
+| gpt-oss-120b            | **FREE**  | **FREE**   | 128K    |           |
+| o3                      | $2.00     | $8.00      | 200K    |    \*     |
+| o4-mini                 | $1.10     | $4.40      | 128K    |    \*     |
+| **Anthropic**           |           |            |         |           |
+| claude-opus-4.5         | $5.00     | $25.00     | 200K    |    \*     |
+| claude-sonnet-4.6       | $3.00     | $15.00     | 200K    |    \*     |
+| claude-haiku-4.5        | $1.00     | $5.00      | 200K    |           |
+| **Google**              |           |            |         |           |
+| gemini-3-pro-preview    | $2.00     | $12.00     | 1M      |    \*     |
+| gemini-2.5-pro          | $1.25     | $10.00     | 1M      |    \*     |
+| gemini-2.5-flash        | $0.15     | $0.60      | 1M      |           |
+| **DeepSeek**            |           |            |         |           |
+| deepseek-chat           | $0.14     | $0.28      | 128K    |           |
+| deepseek-reasoner       | $0.55     | $2.19      | 128K    |    \*     |
+| **xAI**                 |           |            |         |           |
+| grok-4-0709             | $0.20     | $1.50      | 131K    |    \*     |
+| grok-4-1-fast-reasoning | $0.20     | $0.50      | 131K    |    \*     |
+| grok-code-fast-1        | $0.20     | $1.50      | 131K    |           |
+| **Moonshot**            |           |            |         |           |
+| kimi-k2.5               | $0.50     | $2.40      | 262K    |    \*     |
+| **MiniMax**             |           |            |         |           |
+| minimax-m2.5            | $0.30     | $1.20      | 205K    |    \*     |
 
 </details>
 
@@ -154,6 +154,7 @@ Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Resp
 </table>
 
 **The flow:**
+
 1. **Wallet auto-generated** on Base (L2) — saved at `~/.openclaw/blockrun/wallet.key`
 2. **Fund with $1 USDC** — enough for hundreds of requests
 3. **Request any model** — ClawRouter picks the cheapest capable one
@@ -177,6 +178,7 @@ USDC stays in your wallet until spent — non-custodial. Price is visible in the
 ```
 
 **Fund your wallet:**
+
 - **Coinbase:** Buy USDC, send to Base
 - **Bridge:** Move USDC from any chain to Base
 - **CEX:** Withdraw USDC to Base network
@@ -187,11 +189,11 @@ USDC stays in your wallet until spent — non-custodial. Price is visible in the
 
 For basic usage, no configuration needed. For advanced options:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
+| Variable              | Default        | Description             |
+| --------------------- | -------------- | ----------------------- |
 | `BLOCKRUN_WALLET_KEY` | auto-generated | Your wallet private key |
-| `BLOCKRUN_PROXY_PORT` | `8402` | Local proxy port |
-| `CLAWROUTER_DISABLED` | `false` | Disable smart routing |
+| `BLOCKRUN_PROXY_PORT` | `8402`         | Local proxy port        |
+| `CLAWROUTER_DISABLED` | `false`        | Disable smart routing   |
 
 **Full reference:** [docs/configuration.md](docs/configuration.md)
 
@@ -199,14 +201,14 @@ For basic usage, no configuration needed. For advanced options:
 
 ## 🥊 vs OpenRouter
 
-|  | OpenRouter / LiteLLM | ClawRouter |
-|--|---------------------|------------|
-| **Setup** | Human creates account | Agent generates wallet |
-| **Auth** | API key (shared secret) | Wallet signature (cryptographic) |
-| **Payment** | Prepaid balance (custodial) | Per-request (non-custodial) |
-| **Routing** | Proprietary / closed | Open source, client-side |
-| **Rate limits** | Per-key quotas | None (your wallet, your limits) |
-| **Cost** | $25/M (Opus equivalent) | $2.05/M blended average |
+|                 | OpenRouter / LiteLLM        | ClawRouter                       |
+| --------------- | --------------------------- | -------------------------------- |
+| **Setup**       | Human creates account       | Agent generates wallet           |
+| **Auth**        | API key (shared secret)     | Wallet signature (cryptographic) |
+| **Payment**     | Prepaid balance (custodial) | Per-request (non-custodial)      |
+| **Routing**     | Proprietary / closed        | Open source, client-side         |
+| **Rate limits** | Per-key quotas              | None (your wallet, your limits)  |
+| **Cost**        | $25/M (Opus equivalent)     | $2.05/M blended average          |
 
 **[Full comparison →](docs/vs-openrouter.md)**
 
@@ -226,28 +228,28 @@ npm test
 
 ## 📞 Support
 
-| Channel | Link |
-|---------|------|
-| 📅 Schedule Demo | [calendly.com/vickyfu9/30min](https://calendly.com/vickyfu9/30min) |
-| 💬 Community Telegram | [t.me/blockrunAI](https://t.me/blockrunAI) |
-| 🐦 X / Twitter | [x.com/BlockRunAI](https://x.com/BlockRunAI) |
-| 📱 Founder Telegram | [@bc1max](https://t.me/bc1max) |
-| ✉️ Email | vicky@blockrun.ai |
+| Channel               | Link                                                               |
+| --------------------- | ------------------------------------------------------------------ |
+| 📅 Schedule Demo      | [calendly.com/vickyfu9/30min](https://calendly.com/vickyfu9/30min) |
+| 💬 Community Telegram | [t.me/blockrunAI](https://t.me/blockrunAI)                         |
+| 🐦 X / Twitter        | [x.com/BlockRunAI](https://x.com/BlockRunAI)                       |
+| 📱 Founder Telegram   | [@bc1max](https://t.me/bc1max)                                     |
+| ✉️ Email              | vicky@blockrun.ai                                                  |
 
 ---
 
 ## 📚 More Resources
 
-| Resource | Description |
-|----------|-------------|
-| [Documentation](https://blockrun.ai/docs) | Full docs |
-| [Model Pricing](https://blockrun.ai/models) | All models & prices |
+| Resource                                     | Description              |
+| -------------------------------------------- | ------------------------ |
+| [Documentation](https://blockrun.ai/docs)    | Full docs                |
+| [Model Pricing](https://blockrun.ai/models)  | All models & prices      |
 | [Routing Profiles](docs/routing-profiles.md) | ECO/AUTO/PREMIUM details |
-| [Architecture](docs/architecture.md) | Technical deep dive |
-| [Configuration](docs/configuration.md) | Environment variables |
-| [vs OpenRouter](docs/vs-openrouter.md) | Why ClawRouter wins |
-| [Features](docs/features.md) | All features |
-| [Troubleshooting](docs/troubleshooting.md) | Common issues |
+| [Architecture](docs/architecture.md)         | Technical deep dive      |
+| [Configuration](docs/configuration.md)       | Environment variables    |
+| [vs OpenRouter](docs/vs-openrouter.md)       | Why ClawRouter wins      |
+| [Features](docs/features.md)                 | All features             |
+| [Troubleshooting](docs/troubleshooting.md)   | Common issues            |
 
 ---
 
