@@ -9,7 +9,9 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
+import { execSync } from "node:child_process";
 import { readdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 interface ScanFinding {
@@ -31,12 +33,36 @@ interface ScanSummary {
 
 type ScanFn = (dir: string) => Promise<ScanSummary>;
 
+/** Resolve openclaw dist dir — try global npm root first, fall back to Docker path. */
+function resolveOpenclawDist(): string {
+  try {
+    const globalRoot = execSync("npm root -g", { encoding: "utf-8" }).trim();
+    return `${globalRoot}/openclaw/dist/`;
+  } catch {
+    return "/usr/local/lib/node_modules/openclaw/dist/";
+  }
+}
+
+/** Resolve ClawRouter dist dir — relative to this file, fall back to Docker path. */
+function resolveClawrouterDist(): string {
+  const local = resolve(__dirname, "../../dist");
+  try {
+    readdirSync(local);
+    return local;
+  } catch {
+    return "/opt/clawrouter/dist";
+  }
+}
+
 describe("OpenClaw security scanner", () => {
   let scanDirectoryWithSummary: ScanFn | undefined;
+  let distDir: string;
 
   beforeAll(async () => {
+    distDir = resolveClawrouterDist();
+
     // Locate openclaw's skill-scanner chunk in its dist/
-    const openclawDist = "/usr/local/lib/node_modules/openclaw/dist/";
+    const openclawDist = resolveOpenclawDist();
     try {
       const files = readdirSync(openclawDist);
       const scannerFile = files.find((f) => f.startsWith("skill-scanner"));
@@ -66,7 +92,7 @@ describe("OpenClaw security scanner", () => {
       return;
     }
 
-    const result = await scanDirectoryWithSummary("/opt/clawrouter/dist");
+    const result = await scanDirectoryWithSummary(distDir);
 
     console.log(`[scanner] Scanned ${result.scannedFiles} files`);
     console.log(`[scanner] Results: ${result.critical} critical, ${result.warn} warn, ${result.info} info`);
@@ -93,7 +119,7 @@ describe("OpenClaw security scanner", () => {
       return;
     }
 
-    const result = await scanDirectoryWithSummary("/opt/clawrouter/dist");
+    const result = await scanDirectoryWithSummary(distDir);
 
     // potential-exfiltration is expected (wallet read + network send)
     const unexpectedWarns = result.findings.filter(
