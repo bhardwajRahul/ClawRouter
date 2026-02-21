@@ -636,9 +636,9 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   // Auto (balanced) tier configs - current default smart routing
   tiers: {
     SIMPLE: {
-      primary: "moonshot/kimi-k2.5", // $0.50/$2.40 - best quality/price for simple tasks
+      primary: "moonshot/kimi-k2.5", // $0.60/$3.00 - best quality/price for simple tasks
       fallback: [
-        "google/gemini-2.5-flash", // 1M context, cost-effective
+        "google/gemini-2.5-flash-lite", // 1M context, ultra cheap ($0.10/$0.40)
         "nvidia/gpt-oss-120b", // FREE fallback
         "deepseek/deepseek-chat",
       ],
@@ -646,21 +646,22 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     MEDIUM: {
       primary: "xai/grok-code-fast-1", // Code specialist, $0.20/$1.50
       fallback: [
-        "google/gemini-2.5-flash", // 1M context, cost-effective
+        "google/gemini-2.5-flash-lite", // 1M context, ultra cheap ($0.10/$0.40)
         "deepseek/deepseek-chat",
         "xai/grok-4-1-fast-non-reasoning", // Upgraded Grok 4.1
       ],
     },
     COMPLEX: {
-      primary: "google/gemini-3-pro-preview", // Latest Gemini - upgraded from 2.5
+      primary: "google/gemini-3.1-pro-preview", // Newest Gemini 3.1 - upgraded from 3.0
       fallback: [
-        "google/gemini-2.5-flash", // CRITICAL: 1M context, cheap failsafe before expensive models
+        "google/gemini-2.5-flash-lite", // CRITICAL: 1M context, ultra-cheap failsafe ($0.10/$0.40)
+        "google/gemini-3-pro-preview", // 3.0 fallback
         "google/gemini-2.5-pro",
         "deepseek/deepseek-chat",
         "xai/grok-4-0709",
         "openai/gpt-5.2", // Newer and cheaper input than gpt-4o
         "openai/gpt-4o",
-        "claude-sonnet-4",
+        "anthropic/claude-sonnet-4.6",
       ],
     },
     REASONING: {
@@ -677,15 +678,15 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   ecoTiers: {
     SIMPLE: {
       primary: "nvidia/gpt-oss-120b", // FREE! $0.00/$0.00
-      fallback: ["google/gemini-2.5-flash", "deepseek/deepseek-chat"],
+      fallback: ["google/gemini-2.5-flash-lite", "deepseek/deepseek-chat"],
     },
     MEDIUM: {
-      primary: "google/gemini-2.5-flash", // $0.15/$0.60 - cheapest capable
+      primary: "google/gemini-2.5-flash-lite", // $0.10/$0.40 - cheapest capable with 1M context
       fallback: ["deepseek/deepseek-chat", "nvidia/gpt-oss-120b"],
     },
     COMPLEX: {
-      primary: "google/gemini-2.5-flash", // $0.15/$0.60 - 1M context handles complexity
-      fallback: ["deepseek/deepseek-chat", "xai/grok-4-0709"],
+      primary: "google/gemini-2.5-flash-lite", // $0.10/$0.40 - 1M context handles complexity
+      fallback: ["google/gemini-2.5-flash", "deepseek/deepseek-chat", "xai/grok-4-0709"],
     },
     REASONING: {
       primary: "xai/grok-4-1-fast-reasoning", // $0.20/$0.50
@@ -697,8 +698,8 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   // codex=complex coding, kimi=simple coding, sonnet=reasoning/instructions, opus=architecture/PM/audits
   premiumTiers: {
     SIMPLE: {
-      primary: "moonshot/kimi-k2.5", // $0.50/$2.40 - good for simple coding
-      fallback: ["claude-haiku-4.5", "google/gemini-2.5-flash", "xai/grok-code-fast-1"],
+      primary: "moonshot/kimi-k2.5", // $0.60/$3.00 - good for simple coding
+      fallback: ["anthropic/claude-haiku-4.5", "google/gemini-2.5-flash-lite", "xai/grok-code-fast-1"],
     },
     MEDIUM: {
       primary: "openai/gpt-5.2-codex", // $2.50/$10 - strong coding for medium tasks
@@ -706,24 +707,25 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
         "moonshot/kimi-k2.5",
         "google/gemini-2.5-pro",
         "xai/grok-4-0709",
-        "claude-sonnet-4",
+        "anthropic/claude-sonnet-4.6",
       ],
     },
     COMPLEX: {
-      primary: "claude-opus-4", // Best quality for complex tasks
+      primary: "anthropic/claude-opus-4.6", // Best quality for complex tasks
       fallback: [
         "openai/gpt-5.2-codex",
-        "claude-opus-4",
-        "claude-sonnet-4",
+        "anthropic/claude-opus-4.6",
+        "anthropic/claude-sonnet-4.6",
+        "google/gemini-3.1-pro-preview", // Newest Gemini
         "google/gemini-3-pro-preview",
         "moonshot/kimi-k2.5",
       ],
     },
     REASONING: {
-      primary: "claude-sonnet-4", // $3/$15 - best for reasoning/instructions
+      primary: "anthropic/claude-sonnet-4.6", // $3/$15 - best for reasoning/instructions
       fallback: [
-        "claude-opus-4",
-        "claude-opus-4",
+        "anthropic/claude-opus-4.6",
+        "anthropic/claude-opus-4.6",
         "openai/o4-mini", // Newer and cheaper than o3 ($1.10 vs $2.00)
         "openai/o3",
         "xai/grok-4-1-fast-reasoning",
@@ -735,24 +737,25 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   agenticTiers: {
     SIMPLE: {
       primary: "moonshot/kimi-k2.5", // Cheaper than Haiku ($0.5/$2.4 vs $1/$5), larger context
-      fallback: ["claude-haiku-4.5", "xai/grok-4-1-fast-non-reasoning", "openai/gpt-4o-mini"],
+      fallback: ["anthropic/claude-haiku-4.5", "xai/grok-4-1-fast-non-reasoning", "openai/gpt-4o-mini"],
     },
     MEDIUM: {
       primary: "xai/grok-code-fast-1", // Code specialist for agentic coding
-      fallback: ["moonshot/kimi-k2.5", "claude-haiku-4.5", "claude-sonnet-4"],
+      fallback: ["moonshot/kimi-k2.5", "anthropic/claude-haiku-4.5", "claude-sonnet-4"],
     },
     COMPLEX: {
-      primary: "claude-sonnet-4",
+      primary: "anthropic/claude-sonnet-4.6",
       fallback: [
-        "claude-opus-4", // Latest Opus - best agentic
+        "anthropic/claude-opus-4.6", // Latest Opus - best agentic
         "openai/gpt-5.2",
+        "google/gemini-3.1-pro-preview", // Newest Gemini
         "google/gemini-3-pro-preview",
         "xai/grok-4-0709",
       ],
     },
     REASONING: {
-      primary: "claude-sonnet-4", // Strong tool use + reasoning for agentic tasks
-      fallback: ["claude-opus-4", "xai/grok-4-1-fast-reasoning", "deepseek/deepseek-reasoner"],
+      primary: "anthropic/claude-sonnet-4.6", // Strong tool use + reasoning for agentic tasks
+      fallback: ["anthropic/claude-opus-4.6", "xai/grok-4-1-fast-reasoning", "deepseek/deepseek-reasoner"],
     },
   },
 

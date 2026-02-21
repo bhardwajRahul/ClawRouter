@@ -6,11 +6,11 @@
 
 Route every request to the right model at the right price.<br>
 15-dimension scoring, <1ms local routing, optimized for autonomous agents.<br>
-One wallet, 30+ models, zero API keys.
+One wallet, 38+ models, zero API keys.
 
 <img src="https://img.shields.io/badge/🚀_92%25_Cost_Savings-success?style=for-the-badge" alt="92% savings">&nbsp;
 <img src="https://img.shields.io/badge/🔑_Zero_API_Keys-blue?style=for-the-badge" alt="No API keys">&nbsp;
-<img src="https://img.shields.io/badge/🤖_30+_Models-purple?style=for-the-badge" alt="30+ models">&nbsp;
+<img src="https://img.shields.io/badge/🤖_38+_Models-purple?style=for-the-badge" alt="38+ models">&nbsp;
 <img src="https://img.shields.io/badge/💰_Non--Custodial-orange?style=for-the-badge" alt="Non-custodial">&nbsp;
 <img src="https://img.shields.io/badge/⚡_<1ms_Routing-yellow?style=for-the-badge" alt="Fast routing">
 
@@ -85,12 +85,12 @@ Choose your routing strategy with `/model <profile>`:
 Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Response
 ```
 
-| Tier      | ECO Model                      | AUTO Model                   | PREMIUM Model             |
-| --------- | ------------------------------ | ---------------------------- | ------------------------- |
-| SIMPLE    | nvidia/gpt-oss-120b (FREE)     | kimi-k2.5 ($0.50/$2.40)      | kimi-k2.5                 |
-| MEDIUM    | gemini-2.5-flash ($0.15/$0.60) | grok-code-fast ($0.20/$1.50) | gpt-5.2-codex ($2.50/$10) |
-| COMPLEX   | gemini-2.5-flash ($0.15/$0.60) | gemini-3-pro ($2/$12)        | claude-opus-4 ($15/$75)   |
-| REASONING | grok-4-fast ($0.20/$0.50)      | grok-4-fast ($0.20/$0.50)    | claude-sonnet-4 ($3/$15)  |
+| Tier      | ECO Model                          | AUTO Model                   | PREMIUM Model                |
+| --------- | ---------------------------------- | ---------------------------- | ---------------------------- |
+| SIMPLE    | nvidia/gpt-oss-120b (FREE)         | kimi-k2.5 ($0.60/$3.00)      | kimi-k2.5                    |
+| MEDIUM    | gemini-2.5-flash-lite ($0.10/$0.40) | grok-code-fast ($0.20/$1.50) | gpt-5.2-codex ($1.75/$14.00) |
+| COMPLEX   | gemini-2.5-flash-lite ($0.10/$0.40) | gemini-3.1-pro ($2/$12)      | claude-opus-4.6 ($5/$25)     |
+| REASONING | grok-4-fast ($0.20/$0.50)          | grok-4-fast ($0.20/$0.50)    | claude-sonnet-4.6 ($3/$15)   |
 
 **Blended average: $2.05/M** vs $25/M for Claude Opus = **92% savings**
 
@@ -98,7 +98,7 @@ Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Resp
 
 ## 💰 Models & Pricing
 
-30+ models across 7 providers, one wallet:
+38+ models across 7 providers, one wallet:
 
 <details>
 <summary><strong>Click to expand full model list</strong></summary>
@@ -110,6 +110,8 @@ Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Resp
 | gpt-4o                  | $2.50     | $10.00     | 128K    |           |
 | gpt-4o-mini             | $0.15     | $0.60      | 128K    |           |
 | gpt-oss-120b            | **FREE**  | **FREE**   | 128K    |           |
+| o1                      | $15.00    | $60.00     | 200K    |    \*     |
+| o1-mini                 | $1.10     | $4.40      | 128K    |    \*     |
 | o3                      | $2.00     | $8.00      | 200K    |    \*     |
 | o4-mini                 | $1.10     | $4.40      | 128K    |    \*     |
 | **Anthropic**           |           |            |         |           |
@@ -117,18 +119,21 @@ Request → Weighted Scorer (15 dimensions) → Tier → Cheapest Model → Resp
 | claude-sonnet-4.6       | $3.00     | $15.00     | 200K    |    \*     |
 | claude-haiku-4.5        | $1.00     | $5.00      | 200K    |           |
 | **Google**              |           |            |         |           |
+| gemini-3.1-pro-preview  | $2.00     | $12.00     | 1M      |    \*     |
 | gemini-3-pro-preview    | $2.00     | $12.00     | 1M      |    \*     |
+| gemini-3-flash-preview  | $0.50     | $3.00      | 1M      |           |
 | gemini-2.5-pro          | $1.25     | $10.00     | 1M      |    \*     |
-| gemini-2.5-flash        | $0.15     | $0.60      | 1M      |           |
+| gemini-2.5-flash        | $0.30     | $2.50      | 1M      |           |
+| gemini-2.5-flash-lite   | $0.10     | $0.40      | 1M      |           |
 | **DeepSeek**            |           |            |         |           |
-| deepseek-chat           | $0.14     | $0.28      | 128K    |           |
-| deepseek-reasoner       | $0.55     | $2.19      | 128K    |    \*     |
+| deepseek-chat           | $0.28     | $0.42      | 128K    |           |
+| deepseek-reasoner       | $0.28     | $0.42      | 128K    |    \*     |
 | **xAI**                 |           |            |         |           |
 | grok-4-0709             | $0.20     | $1.50      | 131K    |    \*     |
 | grok-4-1-fast-reasoning | $0.20     | $0.50      | 131K    |    \*     |
 | grok-code-fast-1        | $0.20     | $1.50      | 131K    |           |
 | **Moonshot**            |           |            |         |           |
-| kimi-k2.5               | $0.50     | $2.40      | 262K    |    \*     |
+| kimi-k2.5               | $0.60     | $3.00      | 262K    |    \*     |
 | **MiniMax**             |           |            |         |           |
 | minimax-m2.5            | $0.30     | $1.20      | 205K    |    \*     |
 

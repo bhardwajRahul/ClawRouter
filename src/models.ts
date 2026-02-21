@@ -15,29 +15,30 @@ import type { ModelDefinitionConfig, ModelProviderConfig } from "./types.js";
  * Users can type `/model claude` instead of `/model blockrun/anthropic/claude-sonnet-4-6`.
  */
 export const MODEL_ALIASES: Record<string, string> = {
-  // Claude - short names (backend uses bare model names without anthropic/ prefix)
-  claude: "claude-sonnet-4",
-  sonnet: "claude-sonnet-4",
-  "sonnet-4.6": "claude-sonnet-4",
-  "sonnet-4-6": "claude-sonnet-4",
-  opus: "claude-opus-4",
-  "opus-4": "claude-opus-4",
-  haiku: "claude-haiku-4.5",
+  // Claude - use newest versions (4.6)
+  claude: "anthropic/claude-sonnet-4.6",
+  sonnet: "anthropic/claude-sonnet-4.6",
+  "sonnet-4": "anthropic/claude-sonnet-4.6",
+  "sonnet-4.6": "anthropic/claude-sonnet-4.6",
+  "sonnet-4-6": "anthropic/claude-sonnet-4.6",
+  opus: "anthropic/claude-opus-4.6",
+  "opus-4": "anthropic/claude-opus-4.6",
+  "opus-4.6": "anthropic/claude-opus-4.6",
+  "opus-4-6": "anthropic/claude-opus-4.6",
+  haiku: "anthropic/claude-haiku-4.5",
   // Claude - provider/shortname patterns (common in agent frameworks)
-  "anthropic/sonnet": "claude-sonnet-4",
-  "anthropic/opus": "claude-opus-4",
-  "anthropic/haiku": "claude-haiku-4.5",
-  "anthropic/claude": "claude-sonnet-4",
-  // Backward compatibility - various formats all route to backend names
-  "anthropic/claude-sonnet-4": "claude-sonnet-4",
-  "anthropic/claude-sonnet-4-6": "claude-sonnet-4",
-  "anthropic/claude-sonnet-4.6": "claude-sonnet-4",
-  "anthropic/claude-opus-4": "claude-opus-4",
-  "anthropic/claude-opus-4-6": "claude-opus-4",
-  "anthropic/claude-opus-4.6": "claude-opus-4",
-  "anthropic/claude-haiku-4": "claude-haiku-4.5",
-  "anthropic/claude-haiku-4-5": "claude-haiku-4.5",
-  "anthropic/claude-haiku-4.5": "claude-haiku-4.5",
+  "anthropic/sonnet": "anthropic/claude-sonnet-4.6",
+  "anthropic/opus": "anthropic/claude-opus-4.6",
+  "anthropic/haiku": "anthropic/claude-haiku-4.5",
+  "anthropic/claude": "anthropic/claude-sonnet-4.6",
+  // Backward compatibility - map all variants to 4.6
+  "anthropic/claude-sonnet-4": "anthropic/claude-sonnet-4.6",
+  "anthropic/claude-sonnet-4-6": "anthropic/claude-sonnet-4.6",
+  "anthropic/claude-opus-4": "anthropic/claude-opus-4.6",
+  "anthropic/claude-opus-4-6": "anthropic/claude-opus-4.6",
+  "anthropic/claude-opus-4.5": "anthropic/claude-opus-4.6",
+  "anthropic/claude-haiku-4": "anthropic/claude-haiku-4.5",
+  "anthropic/claude-haiku-4-5": "anthropic/claude-haiku-4.5",
 
   // OpenAI
   gpt: "openai/gpt-4o",
@@ -45,6 +46,7 @@ export const MODEL_ALIASES: Record<string, string> = {
   gpt5: "openai/gpt-5.2",
   codex: "openai/gpt-5.2-codex",
   mini: "openai/gpt-4o-mini",
+  o1: "openai/o1",
   o3: "openai/o3",
 
   // DeepSeek
@@ -109,6 +111,8 @@ export function resolveModelAlias(model: string): string {
 type BlockRunModel = {
   id: string;
   name: string;
+  /** Model version (e.g., "4.6", "3.1", "5.2") for tracking updates */
+  version?: string;
   inputPrice: number;
   outputPrice: number;
   contextWindow: number;
@@ -159,6 +163,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-5.2",
     name: "GPT-5.2",
+    version: "5.2",
     inputPrice: 1.75,
     outputPrice: 14.0,
     contextWindow: 400000,
@@ -170,6 +175,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-5-mini",
     name: "GPT-5 Mini",
+    version: "5.0",
     inputPrice: 0.25,
     outputPrice: 2.0,
     contextWindow: 200000,
@@ -178,6 +184,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-5-nano",
     name: "GPT-5 Nano",
+    version: "5.0",
     inputPrice: 0.05,
     outputPrice: 0.4,
     contextWindow: 128000,
@@ -186,6 +193,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-5.2-pro",
     name: "GPT-5.2 Pro",
+    version: "5.2",
     inputPrice: 21.0,
     outputPrice: 168.0,
     contextWindow: 400000,
@@ -197,8 +205,9 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-5.2-codex",
     name: "GPT-5.2 Codex",
-    inputPrice: 2.5,
-    outputPrice: 12.0,
+    version: "5.2",
+    inputPrice: 1.75,
+    outputPrice: 14.0,
     contextWindow: 128000,
     maxOutput: 32000,
     agentic: true,
@@ -208,6 +217,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-4.1",
     name: "GPT-4.1",
+    version: "4.1",
     inputPrice: 2.0,
     outputPrice: 8.0,
     contextWindow: 128000,
@@ -217,15 +227,25 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-4.1-mini",
     name: "GPT-4.1 Mini",
+    version: "4.1",
     inputPrice: 0.4,
     outputPrice: 1.6,
     contextWindow: 128000,
     maxOutput: 16384,
   },
-  // gpt-4.1-nano removed - replaced by gpt-5-nano
+  {
+    id: "openai/gpt-4.1-nano",
+    name: "GPT-4.1 Nano",
+    version: "4.1",
+    inputPrice: 0.1,
+    outputPrice: 0.4,
+    contextWindow: 128000,
+    maxOutput: 16384,
+  },
   {
     id: "openai/gpt-4o",
     name: "GPT-4o",
+    version: "4o",
     inputPrice: 2.5,
     outputPrice: 10.0,
     contextWindow: 128000,
@@ -236,16 +256,38 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/gpt-4o-mini",
     name: "GPT-4o Mini",
+    version: "4o-mini",
     inputPrice: 0.15,
     outputPrice: 0.6,
     contextWindow: 128000,
     maxOutput: 16384,
   },
 
-  // OpenAI O-series (Reasoning) - o1/o1-mini removed, replaced by o3/o4
+  // OpenAI O-series (Reasoning)
+  {
+    id: "openai/o1",
+    name: "o1",
+    version: "1",
+    inputPrice: 15.0,
+    outputPrice: 60.0,
+    contextWindow: 200000,
+    maxOutput: 100000,
+    reasoning: true,
+  },
+  {
+    id: "openai/o1-mini",
+    name: "o1-mini",
+    version: "1-mini",
+    inputPrice: 1.1,
+    outputPrice: 4.4,
+    contextWindow: 128000,
+    maxOutput: 65536,
+    reasoning: true,
+  },
   {
     id: "openai/o3",
     name: "o3",
+    version: "3",
     inputPrice: 2.0,
     outputPrice: 8.0,
     contextWindow: 200000,
@@ -255,6 +297,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/o3-mini",
     name: "o3-mini",
+    version: "3-mini",
     inputPrice: 1.1,
     outputPrice: 4.4,
     contextWindow: 128000,
@@ -264,6 +307,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "openai/o4-mini",
     name: "o4-mini",
+    version: "4-mini",
     inputPrice: 1.1,
     outputPrice: 4.4,
     contextWindow: 128000,
@@ -272,10 +316,11 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   },
 
   // Anthropic - all Claude models excel at agentic workflows
-  // Backend uses bare model names (claude-sonnet-4, not anthropic/claude-sonnet-4-6)
+  // Use newest versions (4.6) with full provider prefix
   {
-    id: "claude-haiku-4.5",
+    id: "anthropic/claude-haiku-4.5",
     name: "Claude Haiku 4.5",
+    version: "4.5",
     inputPrice: 1.0,
     outputPrice: 5.0,
     contextWindow: 200000,
@@ -283,8 +328,9 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     agentic: true,
   },
   {
-    id: "claude-sonnet-4",
+    id: "anthropic/claude-sonnet-4.6",
     name: "Claude Sonnet 4.6",
+    version: "4.6",
     inputPrice: 3.0,
     outputPrice: 15.0,
     contextWindow: 200000,
@@ -293,10 +339,11 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     agentic: true,
   },
   {
-    id: "claude-opus-4",
+    id: "anthropic/claude-opus-4.6",
     name: "Claude Opus 4.6",
-    inputPrice: 15.0,
-    outputPrice: 75.0,
+    version: "4.6",
+    inputPrice: 5.0,
+    outputPrice: 25.0,
     contextWindow: 200000,
     maxOutput: 32000,
     reasoning: true,
@@ -305,8 +352,9 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
 
   // Google
   {
-    id: "google/gemini-3-pro-preview",
-    name: "Gemini 3 Pro Preview",
+    id: "google/gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro Preview",
+    version: "3.1",
     inputPrice: 2.0,
     outputPrice: 12.0,
     contextWindow: 1050000,
@@ -315,8 +363,30 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     vision: true,
   },
   {
+    id: "google/gemini-3-pro-preview",
+    name: "Gemini 3 Pro Preview",
+    version: "3.0",
+    inputPrice: 2.0,
+    outputPrice: 12.0,
+    contextWindow: 1050000,
+    maxOutput: 65536,
+    reasoning: true,
+    vision: true,
+  },
+  {
+    id: "google/gemini-3-flash-preview",
+    name: "Gemini 3 Flash Preview",
+    version: "3.0",
+    inputPrice: 0.5,
+    outputPrice: 3.0,
+    contextWindow: 1000000,
+    maxOutput: 65536,
+    vision: true,
+  },
+  {
     id: "google/gemini-2.5-pro",
     name: "Gemini 2.5 Pro",
+    version: "2.5",
     inputPrice: 1.25,
     outputPrice: 10.0,
     contextWindow: 1050000,
@@ -327,8 +397,18 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "google/gemini-2.5-flash",
     name: "Gemini 2.5 Flash",
-    inputPrice: 0.15,
-    outputPrice: 0.6,
+    version: "2.5",
+    inputPrice: 0.3,
+    outputPrice: 2.5,
+    contextWindow: 1000000,
+    maxOutput: 65536,
+  },
+  {
+    id: "google/gemini-2.5-flash-lite",
+    name: "Gemini 2.5 Flash Lite",
+    version: "2.5",
+    inputPrice: 0.1,
+    outputPrice: 0.4,
     contextWindow: 1000000,
     maxOutput: 65536,
   },
@@ -337,6 +417,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "deepseek/deepseek-chat",
     name: "DeepSeek V3.2 Chat",
+    version: "3.2",
     inputPrice: 0.28,
     outputPrice: 0.42,
     contextWindow: 128000,
@@ -345,6 +426,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "deepseek/deepseek-reasoner",
     name: "DeepSeek V3.2 Reasoner",
+    version: "3.2",
     inputPrice: 0.28,
     outputPrice: 0.42,
     contextWindow: 128000,
@@ -356,8 +438,9 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "moonshot/kimi-k2.5",
     name: "Kimi K2.5",
-    inputPrice: 0.5,
-    outputPrice: 2.4,
+    version: "k2.5",
+    inputPrice: 0.6,
+    outputPrice: 3.0,
     contextWindow: 262144,
     maxOutput: 8192,
     reasoning: true,
@@ -369,6 +452,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-3",
     name: "Grok 3",
+    version: "3",
     inputPrice: 3.0,
     outputPrice: 15.0,
     contextWindow: 131072,
@@ -379,6 +463,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-3-mini",
     name: "Grok 3 Mini",
+    version: "3-mini",
     inputPrice: 0.3,
     outputPrice: 0.5,
     contextWindow: 131072,
@@ -389,6 +474,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-4-fast-reasoning",
     name: "Grok 4 Fast Reasoning",
+    version: "4",
     inputPrice: 0.2,
     outputPrice: 0.5,
     contextWindow: 131072,
@@ -398,6 +484,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-4-fast-non-reasoning",
     name: "Grok 4 Fast",
+    version: "4",
     inputPrice: 0.2,
     outputPrice: 0.5,
     contextWindow: 131072,
@@ -406,6 +493,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-4-1-fast-reasoning",
     name: "Grok 4.1 Fast Reasoning",
+    version: "4.1",
     inputPrice: 0.2,
     outputPrice: 0.5,
     contextWindow: 131072,
@@ -415,6 +503,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-4-1-fast-non-reasoning",
     name: "Grok 4.1 Fast",
+    version: "4.1",
     inputPrice: 0.2,
     outputPrice: 0.5,
     contextWindow: 131072,
@@ -423,6 +512,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-code-fast-1",
     name: "Grok Code Fast",
+    version: "1",
     inputPrice: 0.2,
     outputPrice: 1.5,
     contextWindow: 131072,
@@ -432,18 +522,29 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "xai/grok-4-0709",
     name: "Grok 4 (0709)",
+    version: "4-0709",
     inputPrice: 0.2,
     outputPrice: 1.5,
     contextWindow: 131072,
     maxOutput: 16384,
     reasoning: true,
   },
-  // grok-2-vision removed - old, 0 transactions
+  {
+    id: "xai/grok-2-vision",
+    name: "Grok 2 Vision",
+    version: "2",
+    inputPrice: 2.0,
+    outputPrice: 10.0,
+    contextWindow: 131072,
+    maxOutput: 16384,
+    vision: true,
+  },
 
   // MiniMax
   {
     id: "minimax/minimax-m2.5",
     name: "MiniMax M2.5",
+    version: "m2.5",
     inputPrice: 0.3,
     outputPrice: 1.2,
     contextWindow: 204800,
@@ -456,6 +557,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "nvidia/gpt-oss-120b",
     name: "NVIDIA GPT-OSS 120B",
+    version: "120b",
     inputPrice: 0,
     outputPrice: 0,
     contextWindow: 128000,
@@ -464,6 +566,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
   {
     id: "nvidia/kimi-k2.5",
     name: "NVIDIA Kimi K2.5",
+    version: "k2.5",
     inputPrice: 0.55,
     outputPrice: 2.5,
     contextWindow: 262144,

@@ -3,20 +3,23 @@ import { describe, expect, it } from "vitest";
 import { resolveModelAlias } from "./models.js";
 
 describe("resolveModelAlias", () => {
-  it("maps legacy Claude IDs to backend model names", () => {
-    // Backend uses bare model names (claude-sonnet-4, not anthropic/claude-sonnet-4-6)
-    expect(resolveModelAlias("anthropic/claude-sonnet-4.6")).toBe("claude-sonnet-4");
-    expect(resolveModelAlias("anthropic/claude-opus-4.6")).toBe("claude-opus-4");
-    expect(resolveModelAlias("anthropic/claude-haiku-4.5")).toBe("claude-haiku-4.5");
+  it("maps Claude aliases to newest 4.6 versions", () => {
+    // Use newest versions (4.6) with full provider prefix
+    expect(resolveModelAlias("claude")).toBe("anthropic/claude-sonnet-4.6");
+    expect(resolveModelAlias("sonnet")).toBe("anthropic/claude-sonnet-4.6");
+    expect(resolveModelAlias("opus")).toBe("anthropic/claude-opus-4.6");
+    expect(resolveModelAlias("haiku")).toBe("anthropic/claude-haiku-4.5");
   });
 
-  it("resolves legacy IDs even when sent with blockrun/ prefix", () => {
-    expect(resolveModelAlias("blockrun/anthropic/claude-sonnet-4.6")).toBe("claude-sonnet-4");
-    expect(resolveModelAlias("blockrun/anthropic/claude-opus-4.6")).toBe("claude-opus-4");
+  it("resolves aliases even when sent with blockrun/ prefix", () => {
+    expect(resolveModelAlias("blockrun/claude")).toBe("anthropic/claude-sonnet-4.6");
+    expect(resolveModelAlias("blockrun/sonnet-4.6")).toBe("anthropic/claude-sonnet-4.6");
+    expect(resolveModelAlias("blockrun/opus")).toBe("anthropic/claude-opus-4.6");
   });
 
-  it("accepts versioned Sonnet shorthand aliases", () => {
-    expect(resolveModelAlias("sonnet-4.6")).toBe("claude-sonnet-4");
-    expect(resolveModelAlias("blockrun/sonnet-4.6")).toBe("claude-sonnet-4");
+  it("maps legacy Claude IDs to 4.6", () => {
+    expect(resolveModelAlias("anthropic/claude-sonnet-4")).toBe("anthropic/claude-sonnet-4.6");
+    expect(resolveModelAlias("anthropic/claude-opus-4")).toBe("anthropic/claude-opus-4.6");
+    expect(resolveModelAlias("anthropic/claude-opus-4.5")).toBe("anthropic/claude-opus-4.6");
   });
 });

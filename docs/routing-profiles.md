@@ -1,17 +1,17 @@
 # Routing Profiles & Pricing
 
-ClawRouter offers three routing profiles to balance cost vs quality. Prices are in **$/M tokens** (input/output).
+ClawRouter offers four routing profiles to balance cost vs quality. Prices are in **$/M tokens** (input/output).
 
 ## ECO (Absolute Cheapest)
 
 Use `blockrun/eco` for maximum cost savings.
 
-| Tier      | Primary Model               | Input | Output |
-| --------- | --------------------------- | ----- | ------ |
-| SIMPLE    | nvidia/gpt-oss-120b         | $0.00 | $0.00  |
-| MEDIUM    | google/gemini-2.5-flash     | $0.15 | $0.60  |
-| COMPLEX   | google/gemini-2.5-flash     | $0.15 | $0.60  |
-| REASONING | xai/grok-4-1-fast-reasoning | $0.20 | $0.50  |
+| Tier      | Primary Model                  | Input | Output |
+| --------- | ------------------------------ | ----- | ------ |
+| SIMPLE    | nvidia/gpt-oss-120b            | $0.00 | $0.00  |
+| MEDIUM    | google/gemini-2.5-flash-lite   | $0.10 | $0.40  |
+| COMPLEX   | google/gemini-2.5-flash-lite   | $0.10 | $0.40  |
+| REASONING | xai/grok-4-1-fast-reasoning    | $0.20 | $0.50  |
 
 ---
 
@@ -19,12 +19,12 @@ Use `blockrun/eco` for maximum cost savings.
 
 Use `blockrun/auto` for the best quality/price balance.
 
-| Tier      | Primary Model               | Input | Output |
-| --------- | --------------------------- | ----- | ------ |
-| SIMPLE    | moonshot/kimi-k2.5          | $0.50 | $2.40  |
-| MEDIUM    | xai/grok-code-fast-1        | $0.20 | $1.50  |
-| COMPLEX   | google/gemini-3-pro-preview | $2.00 | $12.00 |
-| REASONING | xai/grok-4-1-fast-reasoning | $0.20 | $0.50  |
+| Tier      | Primary Model                   | Input | Output |
+| --------- | ------------------------------- | ----- | ------ |
+| SIMPLE    | moonshot/kimi-k2.5              | $0.60 | $3.00  |
+| MEDIUM    | xai/grok-code-fast-1            | $0.20 | $1.50  |
+| COMPLEX   | google/gemini-3.1-pro-preview   | $2.00 | $12.00 |
+| REASONING | xai/grok-4-1-fast-reasoning     | $0.20 | $0.50  |
 
 ---
 
@@ -34,10 +34,23 @@ Use `blockrun/premium` for maximum quality.
 
 | Tier      | Primary Model        | Input  | Output |
 | --------- | -------------------- | ------ | ------ |
-| SIMPLE    | moonshot/kimi-k2.5   | $0.50  | $2.40  |
-| MEDIUM    | openai/gpt-5.2-codex | $2.50  | $10.00 |
-| COMPLEX   | claude-opus-4        | $15.00 | $75.00 |
-| REASONING | claude-sonnet-4      | $3.00  | $15.00 |
+| SIMPLE    | moonshot/kimi-k2.5   | $0.60  | $3.00  |
+| MEDIUM    | openai/gpt-5.2-codex | $1.75  | $14.00 |
+| COMPLEX   | claude-opus-4.6      | $5.00  | $25.00 |
+| REASONING | claude-sonnet-4.6    | $3.00  | $15.00 |
+
+---
+
+## AGENTIC (Multi-Step Tasks)
+
+Use `blockrun/agentic` for autonomous multi-step tasks, or let ClawRouter auto-detect agentic patterns.
+
+| Tier      | Primary Model        | Input | Output |
+| --------- | -------------------- | ----- | ------ |
+| SIMPLE    | moonshot/kimi-k2.5   | $0.60 | $3.00  |
+| MEDIUM    | xai/grok-code-fast-1 | $0.20 | $1.50  |
+| COMPLEX   | claude-sonnet-4.6    | $3.00 | $15.00 |
+| REASONING | claude-sonnet-4.6    | $3.00 | $15.00 |
 
 ---
 
@@ -45,9 +58,9 @@ Use `blockrun/premium` for maximum quality.
 
 | Tier      | ECO   | AUTO   | Savings  |
 | --------- | ----- | ------ | -------- |
-| SIMPLE    | FREE  | $2.90  | **100%** |
-| MEDIUM    | $0.75 | $1.70  | **56%**  |
-| COMPLEX   | $0.75 | $14.00 | **95%**  |
+| SIMPLE    | FREE  | $3.60  | **100%** |
+| MEDIUM    | $0.50 | $1.70  | **71%**  |
+| COMPLEX   | $0.50 | $14.00 | **96%**  |
 | REASONING | $0.70 | $0.70  | 0%       |
 
 ---
@@ -65,4 +78,4 @@ The router picks the cheapest model capable of handling your query's tier.
 
 ---
 
-_Last updated: v0.9.33_
+_Last updated: v0.10.0_
