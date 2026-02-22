@@ -17,6 +17,7 @@ import { startProxy, getProxyPort } from "./proxy.js";
 import { resolveOrGenerateWalletKey } from "./auth.js";
 import { BalanceMonitor } from "./balance.js";
 import { VERSION } from "./version.js";
+import { runDoctor } from "./doctor.js";
 
 function printHelp(): void {
   console.log(`
@@ -24,11 +25,16 @@ ClawRouter v${VERSION} - Smart LLM Router
 
 Usage:
   clawrouter [options]
+  clawrouter doctor         Run AI-powered diagnostics
 
 Options:
   --version, -v     Show version number
   --help, -h        Show this help message
   --port <number>   Port to listen on (default: ${getProxyPort()})
+
+Commands:
+  doctor [question] Diagnose issues and get AI-powered fix suggestions
+                    Optional: Add your question for targeted help
 
 Examples:
   # Start standalone proxy (survives gateway restarts)
@@ -36,6 +42,12 @@ Examples:
 
   # Start on custom port
   npx @blockrun/clawrouter --port 9000
+
+  # Run diagnostics when something isn't working
+  npx @blockrun/clawrouter doctor
+
+  # Ask a specific question
+  npx @blockrun/clawrouter doctor "why is my request failing?"
 
   # Production deployment with PM2
   pm2 start "npx @blockrun/clawrouter" --name clawrouter
@@ -48,8 +60,8 @@ For more info: https://github.com/BlockRunAI/ClawRouter
 `);
 }
 
-function parseArgs(args: string[]): { version: boolean; help: boolean; port?: number } {
-  const result = { version: false, help: false, port: undefined as number | undefined };
+function parseArgs(args: string[]): { version: boolean; help: boolean; doctor: boolean; port?: number } {
+  const result = { version: false, help: false, doctor: false, port: undefined as number | undefined };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -57,6 +69,8 @@ function parseArgs(args: string[]): { version: boolean; help: boolean; port?: nu
       result.version = true;
     } else if (arg === "--help" || arg === "-h") {
       result.help = true;
+    } else if (arg === "doctor" || arg === "--doctor") {
+      result.doctor = true;
     } else if (arg === "--port" && args[i + 1]) {
       result.port = parseInt(args[i + 1], 10);
       i++; // Skip next arg
@@ -76,6 +90,15 @@ async function main(): Promise<void> {
 
   if (args.help) {
     printHelp();
+    process.exit(0);
+  }
+
+  if (args.doctor) {
+    // Get any additional arguments as the user's question
+    const rawArgs = process.argv.slice(2);
+    const doctorIndex = rawArgs.findIndex((a) => a === "doctor" || a === "--doctor");
+    const userQuestion = rawArgs.slice(doctorIndex + 1).join(" ").trim() || undefined;
+    await runDoctor(userQuestion);
     process.exit(0);
   }
 
