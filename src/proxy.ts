@@ -1678,6 +1678,7 @@ async function proxyRequest(
       // Log routing errors so they're not silently swallowed
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`[ClawRouter] Routing error: ${errorMsg}`);
+      console.error(`[ClawRouter] Run 'npx @blockrun/clawrouter doctor' for help`);
       options.onError?.(new Error(`Routing failed: ${errorMsg}`));
     }
   }

@@ -33,17 +33,18 @@ One wallet, 38+ models, zero API keys.
 
 ## 📑 Quick Navigation
 
-| Section                                   | Description                 |
-| ----------------------------------------- | --------------------------- |
-| [Quick Start](#-quick-start)              | Install in 2 minutes        |
-| [Routing Profiles](#-routing-profiles)    | eco / auto / premium / free |
-| [How It Works](#-how-it-works)            | 15-dimension local routing  |
-| [Models & Pricing](#-models--pricing)     | 30+ models, full price list |
-| [Screenshots](#-screenshots)              | See it in action            |
-| [Payment](#-payment)                      | x402 non-custodial USDC     |
-| [Configuration](#%EF%B8%8F-configuration) | Environment variables       |
-| [vs OpenRouter](#-vs-openrouter)          | Why ClawRouter wins         |
-| [Support](#-support)                      | Telegram, X, founders       |
+| Section                                   | Description                    |
+| ----------------------------------------- | ------------------------------ |
+| [Quick Start](#-quick-start)              | Install in 2 minutes           |
+| [Routing Profiles](#-routing-profiles)    | eco / auto / premium / free    |
+| [How It Works](#-how-it-works)            | 15-dimension local routing     |
+| [Models & Pricing](#-models--pricing)     | 30+ models, full price list    |
+| [Screenshots](#-screenshots)              | See it in action               |
+| [Payment](#-payment)                      | x402 non-custodial USDC        |
+| [Configuration](#%EF%B8%8F-configuration) | Environment variables          |
+| [Troubleshooting](#-troubleshooting)      | `doctor` AI-powered diagnostics |
+| [vs OpenRouter](#-vs-openrouter)          | Why ClawRouter wins            |
+| [Support](#-support)                      | Telegram, X, founders          |
 
 ---
 
@@ -216,6 +217,48 @@ For basic usage, no configuration needed. For advanced options:
 | **Cost**        | $25/M (Opus equivalent)     | $2.05/M blended average          |
 
 **[Full comparison →](docs/vs-openrouter.md)**
+
+---
+
+## 🩺 Troubleshooting
+
+**When things go wrong, run the doctor:**
+
+```bash
+npx @blockrun/clawrouter doctor
+```
+
+This collects diagnostics and sends them to Claude Opus 4.6 for AI-powered analysis:
+
+```
+🩺 BlockRun Doctor v0.10.1
+
+System
+  ✓ OS: darwin arm64
+  ✓ Node: v20.11.0
+  ✓ Memory: 8.2GB free / 16.0GB
+
+Wallet
+  ✓ Address: 0x1234...abcd
+  ✓ Balance: $12.50
+
+Network
+  ✓ BlockRun API: reachable (142ms)
+  ✗ Local proxy: not running on :8402
+
+📤 Sending to Claude Opus 4.6...
+
+🤖 AI Analysis:
+The local proxy isn't running. Run `openclaw gateway restart` to fix.
+```
+
+**Ask a specific question:**
+
+```bash
+npx @blockrun/clawrouter doctor "why is my request failing?"
+```
+
+**Cost:** ~$0.01 per analysis (paid via your wallet balance)
 
 ---
 

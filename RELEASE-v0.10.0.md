@@ -13,6 +13,7 @@
 - ✅ **67% Cheaper ECO Tier** - Flash Lite dramatically reduces costs
 - ✅ **Fixed 5 Pricing Errors** - 15-30% better routing decisions
 - ✅ **100% OpenClaw Compatible** - Fully aligned with OpenClaw 2026.2.21
+- ✅ **NEW: `blockrun doctor`** - AI-powered diagnostics when things go wrong
 
 ---
 
