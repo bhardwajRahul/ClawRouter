@@ -228,15 +228,14 @@ For basic usage, no configuration needed. For advanced options:
 npx @blockrun/clawrouter doctor
 ```
 
-This collects diagnostics and sends them to Claude Opus 4.6 for AI-powered analysis:
+This collects diagnostics and sends them to Claude Sonnet for AI-powered analysis:
 
 ```
-🩺 BlockRun Doctor v0.10.1
+🩺 BlockRun Doctor v0.10.4
 
 System
   ✓ OS: darwin arm64
   ✓ Node: v20.11.0
-  ✓ Memory: 8.2GB free / 16.0GB
 
 Wallet
   ✓ Address: 0x1234...abcd
@@ -246,19 +245,26 @@ Network
   ✓ BlockRun API: reachable (142ms)
   ✗ Local proxy: not running on :8402
 
-📤 Sending to Claude Opus 4.6...
+📤 Sending to Claude Sonnet 4.6 (~$0.003)...
 
 🤖 AI Analysis:
 The local proxy isn't running. Run `openclaw gateway restart` to fix.
+```
+
+**Use Opus for complex issues:**
+
+```bash
+npx @blockrun/clawrouter doctor opus
 ```
 
 **Ask a specific question:**
 
 ```bash
 npx @blockrun/clawrouter doctor "why is my request failing?"
+npx @blockrun/clawrouter doctor opus "深度分析我的配置"
 ```
 
-**Cost:** ~$0.01 per analysis (paid via your wallet balance)
+**Cost:** Sonnet ~$0.003 (default) | Opus ~$0.01
 
 ---
 

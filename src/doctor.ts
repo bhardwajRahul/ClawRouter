@@ -272,8 +272,28 @@ function printDiagnostics(result: DiagnosticResult): void {
   }
 }
 
+// Model options for doctor command
+type DoctorModel = "sonnet" | "opus";
+
+const DOCTOR_MODELS: Record<DoctorModel, { id: string; name: string; cost: string }> = {
+  sonnet: {
+    id: "anthropic/claude-sonnet-4.6",
+    name: "Claude Sonnet 4.6",
+    cost: "~$0.003",
+  },
+  opus: {
+    id: "anthropic/claude-opus-4.6",
+    name: "Claude Opus 4.6",
+    cost: "~$0.01",
+  },
+};
+
 // Send to AI for analysis
-async function analyzeWithAI(diagnostics: DiagnosticResult, userQuestion?: string): Promise<void> {
+async function analyzeWithAI(
+  diagnostics: DiagnosticResult,
+  userQuestion?: string,
+  model: DoctorModel = "sonnet",
+): Promise<void> {
   // Check if wallet has funds
   if (diagnostics.wallet.isEmpty) {
     console.log("\n💳 Wallet is empty - cannot call AI for analysis.");
@@ -283,7 +303,8 @@ async function analyzeWithAI(diagnostics: DiagnosticResult, userQuestion?: strin
     return;
   }
 
-  console.log("\n📤 Sending to Claude Opus 4.6...\n");
+  const modelConfig = DOCTOR_MODELS[model];
+  console.log(`\n📤 Sending to ${modelConfig.name} (${modelConfig.cost})...\n`);
 
   try {
     const { key } = await resolveOrGenerateWalletKey();
@@ -295,7 +316,7 @@ async function analyzeWithAI(diagnostics: DiagnosticResult, userQuestion?: strin
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "anthropic/claude-opus-4.6",
+          model: modelConfig.id,
           stream: false,
           messages: [
             {
@@ -344,7 +365,10 @@ Analyze the diagnostics and:
 }
 
 // Main entry point
-export async function runDoctor(userQuestion?: string): Promise<void> {
+export async function runDoctor(
+  userQuestion?: string,
+  model: "sonnet" | "opus" = "sonnet",
+): Promise<void> {
   console.log(`\n🩺 BlockRun Doctor v${VERSION}\n`);
 
   // Collect all diagnostics
@@ -372,5 +396,5 @@ export async function runDoctor(userQuestion?: string): Promise<void> {
   printDiagnostics(result);
 
   // Send to AI for analysis
-  await analyzeWithAI(result, userQuestion);
+  await analyzeWithAI(result, userQuestion, model);
 }

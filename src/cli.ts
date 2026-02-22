@@ -25,7 +25,7 @@ ClawRouter v${VERSION} - Smart LLM Router
 
 Usage:
   clawrouter [options]
-  clawrouter doctor         Run AI-powered diagnostics
+  clawrouter doctor [opus] [question]
 
 Options:
   --version, -v     Show version number
@@ -33,24 +33,24 @@ Options:
   --port <number>   Port to listen on (default: ${getProxyPort()})
 
 Commands:
-  doctor [question] Diagnose issues and get AI-powered fix suggestions
-                    Optional: Add your question for targeted help
+  doctor            AI-powered diagnostics (default: Sonnet ~$0.003)
+  doctor opus       Use Opus for deeper analysis (~$0.01)
 
 Examples:
-  # Start standalone proxy (survives gateway restarts)
+  # Start standalone proxy
   npx @blockrun/clawrouter
 
-  # Start on custom port
-  npx @blockrun/clawrouter --port 9000
-
-  # Run diagnostics when something isn't working
+  # Run diagnostics (uses Sonnet by default)
   npx @blockrun/clawrouter doctor
+
+  # Use Opus for complex issues
+  npx @blockrun/clawrouter doctor opus
 
   # Ask a specific question
   npx @blockrun/clawrouter doctor "why is my request failing?"
 
-  # Production deployment with PM2
-  pm2 start "npx @blockrun/clawrouter" --name clawrouter
+  # Opus + question
+  npx @blockrun/clawrouter doctor opus "深度分析我的配置问题"
 
 Environment Variables:
   BLOCKRUN_WALLET_KEY     Private key for x402 payments (auto-generated if not set)
@@ -94,11 +94,25 @@ async function main(): Promise<void> {
   }
 
   if (args.doctor) {
-    // Get any additional arguments as the user's question
+    // Parse: doctor [opus|sonnet] [question...]
     const rawArgs = process.argv.slice(2);
     const doctorIndex = rawArgs.findIndex((a) => a === "doctor" || a === "--doctor");
-    const userQuestion = rawArgs.slice(doctorIndex + 1).join(" ").trim() || undefined;
-    await runDoctor(userQuestion);
+    const afterDoctor = rawArgs.slice(doctorIndex + 1);
+
+    // Check if first arg is model selection
+    let model: "sonnet" | "opus" = "sonnet"; // default to cheaper
+    let questionArgs = afterDoctor;
+
+    if (afterDoctor[0] === "opus") {
+      model = "opus";
+      questionArgs = afterDoctor.slice(1);
+    } else if (afterDoctor[0] === "sonnet") {
+      model = "sonnet";
+      questionArgs = afterDoctor.slice(1);
+    }
+
+    const userQuestion = questionArgs.join(" ").trim() || undefined;
+    await runDoctor(userQuestion, model);
     process.exit(0);
   }
 
