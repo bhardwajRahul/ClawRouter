@@ -136,7 +136,7 @@ async function main(): Promise<void> {
       console.error(
         `[ClawRouter] Insufficient funds. Balance: ${info.balanceUSD}, Need: ${info.requiredUSD}`,
       );
-      console.error(`[ClawRouter] Run 'npx @blockrun/clawrouter doctor' for funding help`);
+      console.error(`[ClawRouter] Need help? Run: npx @blockrun/clawrouter doctor`);
     },
   });
 
@@ -180,6 +180,6 @@ async function main(): Promise<void> {
 
 main().catch((err) => {
   console.error(`[ClawRouter] Fatal error: ${err.message}`);
-  console.error(`[ClawRouter] Run 'npx @blockrun/clawrouter doctor' for AI-powered diagnostics`);
+  console.error(`[ClawRouter] Need help? Run: npx @blockrun/clawrouter doctor`);
   process.exit(1);
 });
