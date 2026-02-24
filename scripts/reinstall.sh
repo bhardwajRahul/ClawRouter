@@ -28,6 +28,27 @@ kill_port_processes() {
 echo "🦞 ClawRouter Reinstall"
 echo ""
 
+# 0. Back up wallet key BEFORE removing anything
+WALLET_FILE="$HOME/.openclaw/blockrun/wallet.key"
+WALLET_BACKUP=""
+
+echo "→ Backing up wallet..."
+if [ -f "$WALLET_FILE" ]; then
+  WALLET_KEY=$(cat "$WALLET_FILE" | tr -d '[:space:]')
+  KEY_LEN=${#WALLET_KEY}
+  if [[ "$WALLET_KEY" == 0x* ]] && [ "$KEY_LEN" -eq 66 ]; then
+    WALLET_BACKUP="$HOME/.openclaw/blockrun/wallet.key.bak.$(date +%s)"
+    cp "$WALLET_FILE" "$WALLET_BACKUP"
+    chmod 600 "$WALLET_BACKUP"
+    echo "  ✓ Wallet backed up to: $WALLET_BACKUP"
+  else
+    echo "  ⚠ Wallet file exists but has invalid format — skipping backup"
+  fi
+else
+  echo "  ℹ No existing wallet found"
+fi
+echo ""
+
 # 1. Remove plugin files
 echo "→ Removing plugin files..."
 rm -rf ~/.openclaw/extensions/clawrouter
@@ -290,6 +311,29 @@ if (fs.existsSync(configPath)) {
   console.log('  No openclaw.json found, skipping');
 }
 "
+
+# Final: verify wallet survived reinstall
+echo "→ Verifying wallet integrity..."
+if [ -f "$WALLET_FILE" ]; then
+  CURRENT_KEY=$(cat "$WALLET_FILE" | tr -d '[:space:]')
+  CURRENT_LEN=${#CURRENT_KEY}
+  if [[ "$CURRENT_KEY" == 0x* ]] && [ "$CURRENT_LEN" -eq 66 ]; then
+    echo "  ✓ Wallet key intact"
+  else
+    if [ -n "$WALLET_BACKUP" ] && [ -f "$WALLET_BACKUP" ]; then
+      cp "$WALLET_BACKUP" "$WALLET_FILE"
+      chmod 600 "$WALLET_FILE"
+      echo "  ✓ Wallet restored from backup"
+    fi
+  fi
+else
+  if [ -n "$WALLET_BACKUP" ] && [ -f "$WALLET_BACKUP" ]; then
+    mkdir -p "$(dirname "$WALLET_FILE")"
+    cp "$WALLET_BACKUP" "$WALLET_FILE"
+    chmod 600 "$WALLET_FILE"
+    echo "  ✓ Wallet restored from backup: $WALLET_BACKUP"
+  fi
+fi
 
 echo ""
 echo "✓ Done! Smart routing enabled by default."
