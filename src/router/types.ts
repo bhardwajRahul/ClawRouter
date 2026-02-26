@@ -27,6 +27,7 @@ export type RoutingDecision = {
   costEstimate: number;
   baselineCost: number;
   savings: number; // 0-1 percentage
+  agenticScore?: number; // 0-1 agentic task score (present when tier routing used)
 };
 
 export type TierConfig = {

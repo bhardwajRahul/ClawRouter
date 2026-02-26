@@ -27,6 +27,7 @@ export function selectModel(
   estimatedInputTokens: number,
   maxOutputTokens: number,
   routingProfile?: "free" | "eco" | "auto" | "premium",
+  agenticScore?: number,
 ): RoutingDecision {
   const tierConfig = tierConfigs[tier];
   const model = tierConfig.primary;
@@ -64,6 +65,7 @@ export function selectModel(
     costEstimate,
     baselineCost,
     savings,
+    ...(agenticScore !== undefined && { agenticScore }),
   };
 }
 

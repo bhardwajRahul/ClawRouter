@@ -1601,6 +1601,9 @@ async function proxyRequest(
   // Track original context size for response headers
   const originalContextSizeKB = Math.ceil(body.length / 1024);
 
+  // Routing debug info is on by default; disable with x-clawrouter-debug: false
+  const debugMode = req.headers["x-clawrouter-debug"] !== "false";
+
   // --- Smart routing ---
   let routingDecision: RoutingDecision | undefined;
   let isStreaming = false;
@@ -2013,12 +2016,20 @@ async function proxyRequest(
       const estimatedInputTokens = Math.ceil(body.length / 4);
       const estimatedTotalTokens = estimatedInputTokens + maxTokens;
 
-      // Get tier configs (use agentic tiers if routing decided to use them)
-      const useAgenticTiers =
-        routingDecision.reasoning?.includes("agentic") && routerOpts.config.agenticTiers;
-      const tierConfigs = useAgenticTiers
-        ? routerOpts.config.agenticTiers!
-        : routerOpts.config.tiers;
+      // Get tier configs matching the profile that was used for routing
+      // Must stay in sync with what route() selected in router/index.ts
+      const tierConfigs = (() => {
+        if (routingDecision.reasoning?.includes("agentic") && routerOpts.config.agenticTiers) {
+          return routerOpts.config.agenticTiers;
+        }
+        if (routingProfile === "eco" && routerOpts.config.ecoTiers) {
+          return routerOpts.config.ecoTiers;
+        }
+        if (routingProfile === "premium" && routerOpts.config.premiumTiers) {
+          return routerOpts.config.premiumTiers;
+        }
+        return routerOpts.config.tiers;
+      })();
 
       // Get full chain first, then filter by context
       const fullChain = getFallbackChain(routingDecision.tier, tierConfigs);
@@ -2116,6 +2127,15 @@ async function proxyRequest(
     if (heartbeatInterval) {
       clearInterval(heartbeatInterval);
       heartbeatInterval = undefined;
+    }
+
+    // --- Emit routing debug info (opt-in via x-clawrouter-debug: true header) ---
+    // For streaming: SSE comment (invisible to most clients, visible in raw stream)
+    // For non-streaming: response headers added later
+    if (debugMode && headersSentEarly && routingDecision) {
+      const debugComment =
+        `: x-clawrouter-debug profile=${routingProfile ?? "auto"} tier=${routingDecision.tier} model=${actualModelUsed} agentic=${routingDecision.agenticScore?.toFixed(2) ?? "n/a"} confidence=${routingDecision.confidence.toFixed(2)} reasoning=${routingDecision.reasoning}\n\n`;
+      safeWrite(res, debugComment);
     }
 
     // Update routing decision with actual model used (for logging)
@@ -2365,6 +2385,18 @@ async function proxyRequest(
       // Add context usage headers
       responseHeaders["x-context-used-kb"] = String(originalContextSizeKB);
       responseHeaders["x-context-limit-kb"] = String(CONTEXT_LIMIT_KB);
+
+      // Add routing debug headers (opt-in via x-clawrouter-debug: true header)
+      if (debugMode && routingDecision) {
+        responseHeaders["x-clawrouter-profile"] = routingProfile ?? "auto";
+        responseHeaders["x-clawrouter-tier"] = routingDecision.tier;
+        responseHeaders["x-clawrouter-model"] = actualModelUsed;
+        responseHeaders["x-clawrouter-confidence"] = routingDecision.confidence.toFixed(2);
+        responseHeaders["x-clawrouter-reasoning"] = routingDecision.reasoning;
+        if (routingDecision.agenticScore !== undefined) {
+          responseHeaders["x-clawrouter-agentic-score"] = routingDecision.agenticScore.toFixed(2);
+        }
+      }
 
       res.writeHead(upstream.status, responseHeaders);
 

@@ -66,6 +66,8 @@ export function route(
     profileSuffix = useAgenticTiers ? " | agentic" : "";
   }
 
+  const agenticScoreValue = ruleResult.agenticScore;
+
   // --- Override: large context → force COMPLEX ---
   if (estimatedTokens > config.overrides.maxTokensForceComplex) {
     return selectModel(
@@ -78,6 +80,7 @@ export function route(
       estimatedTokens,
       maxOutputTokens,
       routingProfile,
+      agenticScoreValue,
     );
   }
 
@@ -122,6 +125,7 @@ export function route(
     estimatedTokens,
     maxOutputTokens,
     routingProfile,
+    agenticScoreValue,
   );
 }
 
