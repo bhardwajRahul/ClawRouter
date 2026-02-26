@@ -140,23 +140,23 @@ export function classifyByRules(
   estimatedTokens: number,
   config: ScoringConfig,
 ): ScoringResult {
-  const text = `${systemPrompt ?? ""} ${prompt}`.toLowerCase();
-  // User prompt only — used for reasoning markers (system prompt shouldn't influence complexity)
+  // Score against user prompt only — system prompts contain boilerplate keywords
+  // (tool definitions, skill descriptions, behavioral rules) that dominate scoring
+  // and make every request score identically. See GitHub issue #50.
   const userText = prompt.toLowerCase();
 
-  // Score all 14 dimensions
+  // Score all 14 dimensions against user text only
   const dimensions: DimensionScore[] = [
-    // Original 8 dimensions
+    // Token count uses total estimated tokens (system + user) — context size matters for model selection
     scoreTokenCount(estimatedTokens, config.tokenCountThresholds),
     scoreKeywordMatch(
-      text,
+      userText,
       config.codeKeywords,
       "codePresence",
       "code",
       { low: 1, high: 2 },
       { none: 0, low: 0.5, high: 1.0 },
     ),
-    // Reasoning markers use USER prompt only — system prompt "step by step" shouldn't trigger reasoning
     scoreKeywordMatch(
       userText,
       config.reasoningKeywords,
@@ -166,7 +166,7 @@ export function classifyByRules(
       { none: 0, low: 0.7, high: 1.0 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.technicalKeywords,
       "technicalTerms",
       "technical",
@@ -174,7 +174,7 @@ export function classifyByRules(
       { none: 0, low: 0.5, high: 1.0 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.creativeKeywords,
       "creativeMarkers",
       "creative",
@@ -182,19 +182,19 @@ export function classifyByRules(
       { none: 0, low: 0.5, high: 0.7 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.simpleKeywords,
       "simpleIndicators",
       "simple",
       { low: 1, high: 2 },
       { none: 0, low: -1.0, high: -1.0 },
     ),
-    scoreMultiStep(text),
+    scoreMultiStep(userText),
     scoreQuestionComplexity(prompt),
 
     // 6 new dimensions
     scoreKeywordMatch(
-      text,
+      userText,
       config.imperativeVerbs,
       "imperativeVerbs",
       "imperative",
@@ -202,7 +202,7 @@ export function classifyByRules(
       { none: 0, low: 0.3, high: 0.5 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.constraintIndicators,
       "constraintCount",
       "constraints",
@@ -210,7 +210,7 @@ export function classifyByRules(
       { none: 0, low: 0.3, high: 0.7 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.outputFormatKeywords,
       "outputFormat",
       "format",
@@ -218,7 +218,7 @@ export function classifyByRules(
       { none: 0, low: 0.4, high: 0.7 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.referenceKeywords,
       "referenceComplexity",
       "references",
@@ -226,7 +226,7 @@ export function classifyByRules(
       { none: 0, low: 0.3, high: 0.5 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.negationKeywords,
       "negationComplexity",
       "negation",
@@ -234,7 +234,7 @@ export function classifyByRules(
       { none: 0, low: 0.3, high: 0.5 },
     ),
     scoreKeywordMatch(
-      text,
+      userText,
       config.domainSpecificKeywords,
       "domainSpecificity",
       "domain-specific",
