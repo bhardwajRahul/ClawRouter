@@ -354,8 +354,8 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
 
   // Google
   {
-    id: "google/gemini-3.1-pro-preview",
-    name: "Gemini 3.1 Pro Preview",
+    id: "google/gemini-3.1-pro",
+    name: "Gemini 3.1 Pro",
     version: "3.1",
     inputPrice: 2.0,
     outputPrice: 12.0,

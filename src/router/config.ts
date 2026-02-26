@@ -1057,7 +1057,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       ],
     },
     COMPLEX: {
-      primary: "google/gemini-3.1-pro-preview", // Newest Gemini 3.1 - upgraded from 3.0
+      primary: "google/gemini-3.1-pro", // Newest Gemini 3.1 - upgraded from 3.0
       fallback: [
         "google/gemini-2.5-flash-lite", // CRITICAL: 1M context, ultra-cheap failsafe ($0.10/$0.40)
         "google/gemini-3-pro-preview", // 3.0 fallback
@@ -1125,7 +1125,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
         "openai/gpt-5.2-codex",
         "anthropic/claude-opus-4.6",
         "anthropic/claude-sonnet-4.6",
-        "google/gemini-3.1-pro-preview", // Newest Gemini
+        "google/gemini-3.1-pro", // Newest Gemini
         "google/gemini-3-pro-preview",
         "moonshot/kimi-k2.5",
       ],
@@ -1161,7 +1161,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       fallback: [
         "anthropic/claude-opus-4.6", // Latest Opus - best agentic
         "openai/gpt-5.2",
-        "google/gemini-3.1-pro-preview", // Newest Gemini
+        "google/gemini-3.1-pro", // Newest Gemini
         "google/gemini-3-pro-preview",
         "xai/grok-4-0709",
       ],
