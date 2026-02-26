@@ -14,22 +14,22 @@ In agentic mode, COMPLEX/REASONING tier routes to `claude-sonnet-4.6`, causing a
 
 ### Behavior change
 
-| Scenario | Before | After |
-|----------|--------|-------|
-| "What is React?" (coding system prompt) | agentic mode → Sonnet | standard routing → kimi/grok |
-| "What does this function do?" (coding system prompt) | agentic mode → Sonnet | standard routing → kimi |
-| "Fix the bug, deploy, make sure it works" | agentic mode ✓ | agentic mode ✓ (unchanged) |
-| User explicitly requests multi-step task | agentic mode ✓ | agentic mode ✓ (unchanged) |
+| Scenario                                             | Before                | After                        |
+| ---------------------------------------------------- | --------------------- | ---------------------------- |
+| "What is React?" (coding system prompt)              | agentic mode → Sonnet | standard routing → kimi/grok |
+| "What does this function do?" (coding system prompt) | agentic mode → Sonnet | standard routing → kimi      |
+| "Fix the bug, deploy, make sure it works"            | agentic mode ✓        | agentic mode ✓ (unchanged)   |
+| User explicitly requests multi-step task             | agentic mode ✓        | agentic mode ✓ (unchanged)   |
 
 ---
 
 ## 📋 Files Changed
 
-| File | Change |
-|------|--------|
-| `src/router/rules.ts` | `scoreAgenticTask` uses `userText` instead of combined `text` |
-| `test/e2e.ts` | Add regression tests for coding system prompt agentic false trigger |
-| `package.json` | Version bump `0.10.8` → `0.10.9` |
+| File                  | Change                                                              |
+| --------------------- | ------------------------------------------------------------------- |
+| `src/router/rules.ts` | `scoreAgenticTask` uses `userText` instead of combined `text`       |
+| `test/e2e.ts`         | Add regression tests for coding system prompt agentic false trigger |
+| `package.json`        | Version bump `0.10.8` → `0.10.9`                                    |
 
 ---
 
