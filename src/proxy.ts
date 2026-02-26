@@ -973,7 +973,12 @@ async function proxyPartnerRequest(
   // Forward headers (strip hop-by-hop)
   const headers: Record<string, string> = {};
   for (const [key, value] of Object.entries(req.headers)) {
-    if (key === "host" || key === "connection" || key === "transfer-encoding" || key === "content-length")
+    if (
+      key === "host" ||
+      key === "connection" ||
+      key === "transfer-encoding" ||
+      key === "content-length"
+    )
       continue;
     if (typeof value === "string") headers[key] = value;
   }
@@ -1025,7 +1030,8 @@ async function proxyPartnerRequest(
     baselineCost: 0,
     savings: 0,
     latencyMs,
-    partnerId: (req.url?.split("?")[0] ?? "").replace(/^\/v1\//, "").replace(/\//g, "_") || "unknown",
+    partnerId:
+      (req.url?.split("?")[0] ?? "").replace(/^\/v1\//, "").replace(/\//g, "_") || "unknown",
     service: "partner",
   }).catch(() => {});
 }
@@ -2133,8 +2139,7 @@ async function proxyRequest(
     // For streaming: SSE comment (invisible to most clients, visible in raw stream)
     // For non-streaming: response headers added later
     if (debugMode && headersSentEarly && routingDecision) {
-      const debugComment =
-        `: x-clawrouter-debug profile=${routingProfile ?? "auto"} tier=${routingDecision.tier} model=${actualModelUsed} agentic=${routingDecision.agenticScore?.toFixed(2) ?? "n/a"} confidence=${routingDecision.confidence.toFixed(2)} reasoning=${routingDecision.reasoning}\n\n`;
+      const debugComment = `: x-clawrouter-debug profile=${routingProfile ?? "auto"} tier=${routingDecision.tier} model=${actualModelUsed} agentic=${routingDecision.agenticScore?.toFixed(2) ?? "n/a"} confidence=${routingDecision.confidence.toFixed(2)} reasoning=${routingDecision.reasoning}\n\n`;
       safeWrite(res, debugComment);
     }
 
