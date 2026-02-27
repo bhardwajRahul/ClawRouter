@@ -20,10 +20,12 @@
 **Problem:** Every message in a conversation was routed from scratch. Primary model hits rate limit → falls back to gemini-flash. Next message starts fresh → falls back again. Setting a primary in the dashboard had no effect mid-conversation.
 
 **Root causes:**
+
 1. `SessionStore` had `enabled: false` by default — pinning never activated
 2. `getSessionId()` only read the `x-session-id` header — OpenClaw sends no such header, so session ID was always `undefined`
 
 **Fix:**
+
 - `DEFAULT_SESSION_CONFIG.enabled`: `false` → `true`
 - Added `deriveSessionId()`: stable 8-char hex from SHA-256 of first user message — same conversation opener = same session anchor across all turns
 - `proxy.ts`: `getSessionId(headers) ?? deriveSessionId(parsedMessages)`
@@ -37,6 +39,7 @@ Model selection is now pinned for 30 minutes per conversation with no client-sid
 **Problem:** `xai/grok-code-fast-1` does not support OpenAI-compatible structured function calls. When routed a request with tools, it output the tool invocation as raw JSON text — visually appearing as "talking to itself" in the chat.
 
 **Fix:** Removed `grok-code-fast-1` from all routing paths:
+
 - `tiers.MEDIUM.primary`: `grok-code-fast-1` → `moonshot/kimi-k2.5`
 - `agenticTiers.MEDIUM.primary`: `grok-code-fast-1` → `moonshot/kimi-k2.5`
 - `premiumTiers.SIMPLE.fallback`: `grok-code-fast-1` → `deepseek/deepseek-chat`
@@ -48,6 +51,7 @@ Model selection is now pinned for 30 minutes per conversation with no client-sid
 **Problem:** No mechanism to prevent future routing of tool-bearing requests to models that don't support OpenAI function call format.
 
 **Fix:**
+
 - Added `toolCalling?: boolean` flag to `BlockRunModel` type in `models.ts`
 - All OpenAI, Anthropic, Google, DeepSeek, Kimi, and Grok 4+ models marked `toolCalling: true`
 - `grok-code-fast-1` and `nvidia/gpt-oss-120b` left unset (defaults to false)
@@ -61,6 +65,7 @@ Model selection is now pinned for 30 minutes per conversation with no client-sid
 **Problem:** OpenClaw's plugin loader calls `register()` and ignores the return value. `register()` was `async`, so it returned a `Promise` — OpenClaw discarded it, and all plugin initialization (proxy server, partner tools) was silently skipped.
 
 **Fix:**
+
 - Converted `async register(api)` → `register(api)` (synchronous)
 - Replaced `await import("./partners/index.js")` with a static import at the top of the file
 - No behavior change; the async work was never needed
@@ -69,10 +74,10 @@ Model selection is now pinned for 30 minutes per conversation with no client-sid
 
 ## Version History
 
-| Version  | Date   | Key Change                                        |
-| -------- | ------ | ------------------------------------------------- |
-| v0.10.17 | Feb 26 | Session persistence fix — model no longer jumps   |
-| v0.10.15 | Feb 26 | Tool-calling capability flag + fallback filter    |
-| v0.10.14 | Feb 26 | Remove grok-code-fast-1 from all routing paths    |
-| v0.10.13 | Feb 26 | Fix async plugin registration breaking OpenClaw   |
-| v0.10.12 | Feb 26 | Agentic mode false trigger fix (system prompt)    |
+| Version  | Date   | Key Change                                      |
+| -------- | ------ | ----------------------------------------------- |
+| v0.10.17 | Feb 26 | Session persistence fix — model no longer jumps |
+| v0.10.15 | Feb 26 | Tool-calling capability flag + fallback filter  |
+| v0.10.14 | Feb 26 | Remove grok-code-fast-1 from all routing paths  |
+| v0.10.13 | Feb 26 | Fix async plugin registration breaking OpenClaw |
+| v0.10.12 | Feb 26 | Agentic mode false trigger fix (system prompt)  |
