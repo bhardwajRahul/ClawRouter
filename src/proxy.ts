@@ -57,7 +57,7 @@ import { compressContext, shouldCompress, type NormalizedMessage } from "./compr
 // (universal free fallback means we don't throw balance errors anymore)
 // import { InsufficientFundsError, EmptyWalletError } from "./errors.js";
 import { USER_AGENT } from "./version.js";
-import { SessionStore, getSessionId, type SessionConfig } from "./session.js";
+import { SessionStore, getSessionId, deriveSessionId, type SessionConfig } from "./session.js";
 import { checkForUpdates } from "./updater.js";
 import { PROXY_PORT } from "./config.js";
 import { SessionJournal } from "./journal.js";
@@ -1853,9 +1853,11 @@ async function proxyRequest(
         } else {
           // eco/auto/premium - use tier routing
           // Check for session persistence - use pinned model if available
-          const sessionId = getSessionId(
-            req.headers as Record<string, string | string[] | undefined>,
-          );
+          // Fall back to deriving a session ID from message content when OpenClaw
+          // doesn't send an explicit x-session-id header (the default behaviour).
+          const sessionId =
+            getSessionId(req.headers as Record<string, string | string[] | undefined>) ??
+            deriveSessionId(parsedMessages);
           const existingSession = sessionId ? sessionStore.getSession(sessionId) : undefined;
 
           if (existingSession) {

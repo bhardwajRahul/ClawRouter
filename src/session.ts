@@ -24,7 +24,7 @@ export type SessionConfig = {
 };
 
 export const DEFAULT_SESSION_CONFIG: SessionConfig = {
-  enabled: false,
+  enabled: true,
   timeoutMs: 30 * 60 * 1000, // 30 minutes
   headerName: "x-session-id",
 };
@@ -179,4 +179,27 @@ export function getSessionId(
     return value[0];
   }
   return undefined;
+}
+
+/**
+ * Derive a stable session ID from message content when no explicit session
+ * header is provided. Uses the first user message as the conversation anchor —
+ * same opening message = same session ID across all subsequent turns.
+ *
+ * This prevents model-switching mid-conversation even when OpenClaw doesn't
+ * send an x-session-id header (which is the default OpenClaw behaviour).
+ */
+export function deriveSessionId(
+  messages: Array<{ role: string; content: unknown }>,
+): string | undefined {
+  const firstUser = messages.find((m) => m.role === "user");
+  if (!firstUser) return undefined;
+
+  const content =
+    typeof firstUser.content === "string" ? firstUser.content : JSON.stringify(firstUser.content);
+
+  // 8-char hex prefix of SHA-256 — short enough for logs, collision-resistant
+  // enough for session tracking within a single gateway instance.
+  const { createHash } = require("node:crypto") as typeof import("node:crypto");
+  return createHash("sha256").update(content).digest("hex").slice(0, 8);
 }

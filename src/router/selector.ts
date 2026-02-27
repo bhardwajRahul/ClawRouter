@@ -14,6 +14,11 @@ export type ModelPricing = {
 
 const BASELINE_MODEL_ID = "anthropic/claude-opus-4.6";
 
+// Hardcoded fallback: Claude Opus 4.6 pricing (per 1M tokens)
+// Used when baseline model not found in dynamic pricing map
+const BASELINE_INPUT_PRICE = 5.0;
+const BASELINE_OUTPUT_PRICE = 25.0;
+
 /**
  * Select the primary model for a tier and build the RoutingDecision.
  */
@@ -42,8 +47,8 @@ export function selectModel(
 
   // Baseline: what Claude Opus 4.5 would cost (the premium reference)
   const opusPricing = modelPricing.get(BASELINE_MODEL_ID);
-  const opusInputPrice = opusPricing?.inputPrice ?? 0;
-  const opusOutputPrice = opusPricing?.outputPrice ?? 0;
+  const opusInputPrice = opusPricing?.inputPrice ?? BASELINE_INPUT_PRICE;
+  const opusOutputPrice = opusPricing?.outputPrice ?? BASELINE_OUTPUT_PRICE;
   const baselineInput = (estimatedInputTokens / 1_000_000) * opusInputPrice;
   const baselineOutput = (maxOutputTokens / 1_000_000) * opusOutputPrice;
   const baselineCost = baselineInput + baselineOutput;
@@ -99,8 +104,8 @@ export function calculateModelCost(
 
   // Baseline: what Claude Opus 4.5 would cost (the premium reference)
   const opusPricing = modelPricing.get(BASELINE_MODEL_ID);
-  const opusInputPrice = opusPricing?.inputPrice ?? 0;
-  const opusOutputPrice = opusPricing?.outputPrice ?? 0;
+  const opusInputPrice = opusPricing?.inputPrice ?? BASELINE_INPUT_PRICE;
+  const opusOutputPrice = opusPricing?.outputPrice ?? BASELINE_OUTPUT_PRICE;
   const baselineInput = (estimatedInputTokens / 1_000_000) * opusInputPrice;
   const baselineOutput = (maxOutputTokens / 1_000_000) * opusOutputPrice;
   const baselineCost = baselineInput + baselineOutput;
