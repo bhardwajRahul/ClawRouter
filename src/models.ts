@@ -61,6 +61,8 @@ export const MODEL_ALIASES: Record<string, string> = {
   // Google
   gemini: "google/gemini-2.5-pro",
   flash: "google/gemini-2.5-flash",
+  "gemini-3.1-pro-preview": "google/gemini-3.1-pro",
+  "google/gemini-3.1-pro-preview": "google/gemini-3.1-pro",
 
   // xAI
   grok: "xai/grok-3",
