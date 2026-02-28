@@ -69,6 +69,33 @@ kill_port_processes 8402
 echo "→ Removing old plugin files..."
 rm -rf ~/.openclaw/extensions/clawrouter
 
+# ── Step 3b: Clean stale plugin entry from config ─────────────
+# After deleting plugin files, openclaw's config validator rejects
+# the orphaned plugins.entries.clawrouter reference. Remove it so
+# the fresh install in Step 4 can proceed.
+echo "→ Cleaning config..."
+node -e "
+const fs = require('fs');
+const path = require('path');
+const configPath = path.join(require('os').homedir(), '.openclaw', 'openclaw.json');
+if (!fs.existsSync(configPath)) process.exit(0);
+try {
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const entries = config?.plugins?.entries;
+  if (entries && entries.clawrouter) {
+    delete entries.clawrouter;
+    const tmp = configPath + '.tmp.' + process.pid;
+    fs.writeFileSync(tmp, JSON.stringify(config, null, 2));
+    fs.renameSync(tmp, configPath);
+    console.log('  Removed stale plugin entry');
+  } else {
+    console.log('  Config clean');
+  }
+} catch (err) {
+  console.log('  Skipped: ' + err.message);
+}
+"
+
 # ── Step 4: Install latest version ─────────────────────────────
 echo "→ Installing latest ClawRouter..."
 openclaw plugins install @blockrun/clawrouter
