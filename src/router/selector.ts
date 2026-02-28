@@ -138,6 +138,22 @@ export function filterByToolCalling(
 }
 
 /**
+ * Filter a model list to only those that support vision (image inputs).
+ * When hasVision is false, returns the list unchanged.
+ * When all models lack vision support, returns the full list as a fallback
+ * (better to let the API error than produce an empty chain).
+ */
+export function filterByVision(
+  models: string[],
+  hasVision: boolean,
+  supportsVision: (modelId: string) => boolean,
+): string[] {
+  if (!hasVision) return models;
+  const filtered = models.filter(supportsVision);
+  return filtered.length > 0 ? filtered : models;
+}
+
+/**
  * Get the fallback chain filtered by context length.
  * Only returns models that can handle the estimated total context.
  *

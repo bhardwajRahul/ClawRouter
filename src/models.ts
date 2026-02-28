@@ -351,6 +351,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     outputPrice: 5.0,
     contextWindow: 200000,
     maxOutput: 8192,
+    vision: true,
     agentic: true,
     toolCalling: true,
   },
@@ -363,6 +364,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     contextWindow: 200000,
     maxOutput: 64000,
     reasoning: true,
+    vision: true,
     agentic: true,
     toolCalling: true,
   },
@@ -375,6 +377,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     contextWindow: 200000,
     maxOutput: 32000,
     reasoning: true,
+    vision: true,
     agentic: true,
     toolCalling: true,
   },
@@ -435,6 +438,7 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     outputPrice: 2.5,
     contextWindow: 1000000,
     maxOutput: 65536,
+    vision: true,
     toolCalling: true,
   },
   {
@@ -708,6 +712,16 @@ export function supportsToolCalling(modelId: string): boolean {
   const normalized = modelId.replace("blockrun/", "");
   const model = BLOCKRUN_MODELS.find((m) => m.id === normalized);
   return model?.toolCalling ?? false;
+}
+
+/**
+ * Check if a model supports vision (image inputs).
+ * Models without this flag cannot process image_url content parts.
+ */
+export function supportsVision(modelId: string): boolean {
+  const normalized = modelId.replace("blockrun/", "");
+  const model = BLOCKRUN_MODELS.find((m) => m.id === normalized);
+  return model?.vision ?? false;
 }
 
 /**

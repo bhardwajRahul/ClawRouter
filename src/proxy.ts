@@ -31,6 +31,7 @@ import {
   getFallbackChain,
   getFallbackChainFiltered,
   filterByToolCalling,
+  filterByVision,
   calculateModelCost,
   DEFAULT_ROUTING_CONFIG,
   type RouterOptions,
@@ -47,6 +48,7 @@ import {
   getModelContextWindow,
   isReasoningModel,
   supportsToolCalling,
+  supportsVision,
 } from "./models.js";
 import { logUsage, type UsageEntry } from "./logger.js";
 import { getStats } from "./stats.js";
@@ -58,7 +60,13 @@ import { compressContext, shouldCompress, type NormalizedMessage } from "./compr
 // (universal free fallback means we don't throw balance errors anymore)
 // import { InsufficientFundsError, EmptyWalletError } from "./errors.js";
 import { USER_AGENT } from "./version.js";
-import { SessionStore, getSessionId, deriveSessionId, type SessionConfig } from "./session.js";
+import {
+  SessionStore,
+  getSessionId,
+  deriveSessionId,
+  hashRequestContent,
+  type SessionConfig,
+} from "./session.js";
 import { checkForUpdates } from "./updater.js";
 import { PROXY_PORT } from "./config.js";
 import { SessionJournal } from "./journal.js";
@@ -1617,6 +1625,7 @@ async function proxyRequest(
   // --- Smart routing ---
   let routingDecision: RoutingDecision | undefined;
   let hasTools = false; // true when request includes a tools schema
+  let hasVision = false; // true when request includes image_url content parts
   let isStreaming = false;
   let modelId = "";
   let maxTokens = 4096;
@@ -1898,6 +1907,17 @@ async function proxyRequest(
             console.log(`[ClawRouter] Tools detected (${tools.length}), agentic mode via keywords`);
           }
 
+          // Vision detection: scan messages for image_url content parts
+          hasVision = parsedMessages.some((m) => {
+            if (Array.isArray(m.content)) {
+              return (m.content as Array<{ type: string }>).some((p) => p.type === "image_url");
+            }
+            return false;
+          });
+          if (hasVision) {
+            console.log(`[ClawRouter] Vision content detected, filtering to vision-capable models`);
+          }
+
           // Always route based on current request content
           routingDecision = route(prompt, systemPrompt, maxTokens, {
             ...routerOpts,
@@ -1948,6 +1968,56 @@ async function proxyRequest(
                 model: existingSession.model,
                 tier: existingSession.tier as Tier,
               };
+            }
+
+            // --- Three-strike escalation: detect repetitive request patterns ---
+            const lastAssistantMsg = [...parsedMessages]
+              .reverse()
+              .find((m) => m.role === "assistant");
+            const toolCallNames = Array.isArray((lastAssistantMsg as any)?.tool_calls)
+              ? (lastAssistantMsg as any).tool_calls
+                  .map((tc: any) => tc.function?.name)
+                  .filter(Boolean)
+              : undefined;
+            const contentHash = hashRequestContent(prompt, toolCallNames);
+            const shouldEscalate = sessionStore.recordRequestHash(
+              effectiveSessionId!,
+              contentHash,
+            );
+
+            if (shouldEscalate) {
+              const activeTierConfigs = (() => {
+                if (
+                  routingDecision.reasoning?.includes("agentic") &&
+                  routerOpts.config.agenticTiers
+                ) {
+                  return routerOpts.config.agenticTiers;
+                }
+                if (routingProfile === "eco" && routerOpts.config.ecoTiers) {
+                  return routerOpts.config.ecoTiers;
+                }
+                if (routingProfile === "premium" && routerOpts.config.premiumTiers) {
+                  return routerOpts.config.premiumTiers;
+                }
+                return routerOpts.config.tiers;
+              })();
+
+              const escalation = sessionStore.escalateSession(
+                effectiveSessionId!,
+                activeTierConfigs,
+              );
+              if (escalation) {
+                console.log(
+                  `[ClawRouter] ⚡ 3-strike escalation: ${existingSession.model} → ${escalation.model} (${existingSession.tier} → ${escalation.tier})`,
+                );
+                parsed.model = escalation.model;
+                modelId = escalation.model;
+                routingDecision = {
+                  ...routingDecision,
+                  model: escalation.model,
+                  tier: escalation.tier as Tier,
+                };
+              }
             }
           } else {
             // No session — pin this routing decision for future requests
@@ -2247,8 +2317,17 @@ async function proxyRequest(
         );
       }
 
+      // Filter to models that support vision when request has image_url content
+      const visionFiltered = filterByVision(toolFiltered, hasVision, supportsVision);
+      const visionExcluded = toolFiltered.filter((m) => !visionFiltered.includes(m));
+      if (visionExcluded.length > 0) {
+        console.log(
+          `[ClawRouter] Vision filter: excluded ${visionExcluded.join(", ")} (no vision support)`,
+        );
+      }
+
       // Limit to MAX_FALLBACK_ATTEMPTS to prevent infinite loops
-      modelsToTry = toolFiltered.slice(0, MAX_FALLBACK_ATTEMPTS);
+      modelsToTry = visionFiltered.slice(0, MAX_FALLBACK_ATTEMPTS);
 
       // Deprioritize rate-limited models (put them at the end)
       modelsToTry = prioritizeNonRateLimited(modelsToTry);
