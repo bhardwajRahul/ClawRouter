@@ -1813,11 +1813,11 @@ async function proxyRequest(
         return;
       }
 
-      // --- /image command: generate an image via BlockRun image API ---
-      if (lastContent.startsWith("/image")) {
-        const imageArgs = lastContent.slice("/image".length).trim();
+      // --- /imagegen command: generate an image via BlockRun image API ---
+      if (lastContent.startsWith("/imagegen")) {
+        const imageArgs = lastContent.slice("/imagegen".length).trim();
 
-        // Parse optional flags: /image --model dall-e-3 --size 1792x1024 a cute cat
+        // Parse optional flags: /imagegen --model dall-e-3 --size 1792x1024 a cute cat
         let imageModel = "google/nano-banana";
         let imageSize = "1024x1024";
         let imagePrompt = imageArgs;
@@ -1853,7 +1853,7 @@ async function proxyRequest(
 
         if (!imagePrompt) {
           const errorText = [
-            "Usage: /image <prompt>",
+            "Usage: /imagegen <prompt>",
             "",
             "Options:",
             "  --model <model>  Model to use (default: nano-banana)",
@@ -1867,9 +1867,9 @@ async function proxyRequest(
             "  flux              Black Forest Flux 1.1 Pro — $0.04/image",
             "",
             "Examples:",
-            "  /image a cat wearing sunglasses",
-            "  /image --model dall-e-3 a futuristic city at sunset",
-            "  /image --model banana-pro --size 2048x2048 mountain landscape",
+            "  /imagegen a cat wearing sunglasses",
+            "  /imagegen --model dall-e-3 a futuristic city at sunset",
+            "  /imagegen --model banana-pro --size 2048x2048 mountain landscape",
           ].join("\n");
 
           const completionId = `chatcmpl-image-${Date.now()}`;
@@ -1892,12 +1892,12 @@ async function proxyRequest(
               usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
             }));
           }
-          console.log(`[ClawRouter] /image command → showing usage help`);
+          console.log(`[ClawRouter] /imagegen command → showing usage help`);
           return;
         }
 
         // Call upstream image generation API
-        console.log(`[ClawRouter] /image command → ${imageModel} (${imageSize}): ${imagePrompt.slice(0, 80)}...`);
+        console.log(`[ClawRouter] /imagegen command → ${imageModel} (${imageSize}): ${imagePrompt.slice(0, 80)}...`);
         try {
           const imageUpstreamUrl = `${apiBase}/v1/images/generations`;
           const imageBody = JSON.stringify({ model: imageModel, prompt: imagePrompt, size: imageSize, n: 1 });
@@ -1919,7 +1919,7 @@ async function proxyRequest(
               ? imageResult.error
               : (imageResult.error as { message?: string })?.message ?? `HTTP ${imageResponse.status}`;
             responseText = `Image generation failed: ${errMsg}`;
-            console.log(`[ClawRouter] /image error: ${errMsg}`);
+            console.log(`[ClawRouter] /imagegen error: ${errMsg}`);
           } else {
             const images = imageResult.data ?? [];
             if (images.length === 0) {
@@ -1933,7 +1933,7 @@ async function proxyRequest(
               lines.push("", `Model: ${imageModel} | Size: ${imageSize}`);
               responseText = lines.join("\n");
             }
-            console.log(`[ClawRouter] /image success: ${images.length} image(s) generated`);
+            console.log(`[ClawRouter] /imagegen success: ${images.length} image(s) generated`);
           }
 
           // Return as synthetic chat completion
@@ -1959,7 +1959,7 @@ async function proxyRequest(
           }
         } catch (err) {
           const errMsg = err instanceof Error ? err.message : String(err);
-          console.error(`[ClawRouter] /image error: ${errMsg}`);
+          console.error(`[ClawRouter] /imagegen error: ${errMsg}`);
           if (!res.headersSent) {
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({

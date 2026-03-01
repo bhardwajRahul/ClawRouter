@@ -28,36 +28,36 @@ Request 3: hash=abc123  → strikes: 2 → ESCALATE!
 
 ---
 
-## Feature 2: `/image` command — generate images from chat
+## Feature 2: `/imagegen` command — generate images from chat
 
-Users can now generate images directly from the chat interface using the `/image` command. Powered by BlockRun's image generation API with x402 micropayments.
+Users can now generate images directly from the chat interface using the `/imagegen` command. Powered by BlockRun's image generation API with x402 micropayments.
 
 ### Usage
 
 ```
-/image a cat wearing sunglasses
-/image --model dall-e-3 a futuristic city at sunset
-/image --model banana-pro --size 2048x2048 mountain landscape
+/imagegen a cat wearing sunglasses
+/imagegen --model dall-e-3 a futuristic city at sunset
+/imagegen --model banana-pro --size 2048x2048 mountain landscape
 ```
 
 ### Available models & pricing
 
 | Model | Shorthand | Price |
 |-------|-----------|-------|
-| Google Nano Banana (default) | `nano-banana`, `banana` | $0.05/image |
-| Google Nano Banana Pro | `banana-pro` | $0.10/image (up to 4K) |
-| OpenAI DALL-E 3 | `dall-e-3`, `dalle` | $0.04/image |
-| OpenAI GPT Image 1 | `gpt-image` | $0.02/image |
-| Black Forest Flux 1.1 Pro | `flux` | $0.04/image |
+| Google Nano Banana (default) | `nano-banana`, `banana` | $0.05/imagegen |
+| Google Nano Banana Pro | `banana-pro` | $0.10/imagegen (up to 4K) |
+| OpenAI DALL-E 3 | `dall-e-3`, `dalle` | $0.04/imagegen |
+| OpenAI GPT Image 1 | `gpt-image` | $0.02/imagegen |
+| Black Forest Flux 1.1 Pro | `flux` | $0.04/imagegen |
 
 ### How it works
 
-1. User sends `/image <prompt>` as a chat message
+1. User sends `/imagegen <prompt>` as a chat message
 2. ClawRouter intercepts it in the proxy (same pattern as `/debug`)
-3. Calls `POST /v1/images/generations` upstream with x402 payment
+3. Calls `POST /v1/imagegens/generations` upstream with x402 payment
 4. Returns the image URL as a markdown image in a synthetic chat completion
 
-Running `/image` with no prompt shows full usage help with all models and pricing.
+Running `/imagegen` with no prompt shows full usage help with all models and pricing.
 
 ---
 
