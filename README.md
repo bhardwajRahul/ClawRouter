@@ -37,6 +37,7 @@ One wallet, 41+ models, zero API keys.
 | ----------------------------------------- | ------------------------------- |
 | [Quick Start](#-quick-start)              | Install in 2 minutes            |
 | [Routing Profiles](#-routing-profiles)    | eco / auto / premium / free     |
+| [Image Generation](#-image-generation)    | /imagegen with 5 models         |
 | [How It Works](#-how-it-works)            | 15-dimension local routing      |
 | [Models & Pricing](#-models--pricing)     | 41+ models, full price list     |
 | [Screenshots](#-screenshots)              | See it in action                |
@@ -75,6 +76,28 @@ Choose your routing strategy with `/model <profile>`:
 | `/model free`    | Free tier only     | 100%    | Zero cost        |
 
 **Shortcuts:** `/model grok`, `/model br-sonnet`, `/model gpt5`, `/model o3`
+
+---
+
+## 🎨 Image Generation
+
+Generate images directly from chat with `/imagegen`:
+
+```
+/imagegen a dog dancing on the beach
+/imagegen --model dall-e-3 a futuristic city at sunset
+/imagegen --model banana-pro --size 2048x2048 mountain landscape
+```
+
+| Model         | Provider               | Price       | Max Size  |
+| ------------- | ---------------------- | ----------- | --------- |
+| `nano-banana` | Google Gemini Flash    | $0.05/image | 1024x1024 |
+| `banana-pro`  | Google Gemini Pro      | $0.10/image | 4096x4096 |
+| `dall-e-3`    | OpenAI DALL-E 3        | $0.04/image | 1792x1024 |
+| `gpt-image`   | OpenAI GPT Image 1     | $0.02/image | 1536x1024 |
+| `flux`        | Black Forest Flux 1.1  | $0.04/image | 1024x1024 |
+
+Default model: `nano-banana`. Images are returned as hosted URLs for compatibility with Telegram, Discord, and other clients.
 
 ---
 
