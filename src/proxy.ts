@@ -1927,8 +1927,8 @@ async function proxyRequest(
             } else {
               const lines: string[] = [];
               for (const img of images) {
-                if (img.url) lines.push(`![Generated Image](${img.url})`);
-                if (img.revised_prompt) lines.push(`*Revised prompt: ${img.revised_prompt}*`);
+                if (img.url) lines.push(img.url);
+                if (img.revised_prompt) lines.push(`Revised prompt: ${img.revised_prompt}`);
               }
               lines.push("", `Model: ${imageModel} | Size: ${imageSize}`);
               responseText = lines.join("\n");
