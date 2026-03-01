@@ -14,6 +14,10 @@ export type SessionEntry = {
   createdAt: number;
   lastUsedAt: number;
   requestCount: number;
+  // --- Three-strike escalation ---
+  recentHashes: string[]; // Sliding window of last 3 request content fingerprints
+  strikes: number; // Consecutive similar request count
+  escalated: boolean; // Whether session was already escalated via three-strike
 };
 
 export type SessionConfig = {
@@ -97,6 +101,9 @@ export class SessionStore {
         createdAt: now,
         lastUsedAt: now,
         requestCount: 1,
+        recentHashes: [],
+        strikes: 0,
+        escalated: false,
       });
     }
   }
@@ -156,6 +163,55 @@ export class SessionStore {
   }
 
   /**
+   * Record a request content hash and detect repetitive patterns.
+   * Returns true if escalation should be triggered (3+ consecutive similar requests).
+   */
+  recordRequestHash(sessionId: string, hash: string): boolean {
+    const entry = this.sessions.get(sessionId);
+    if (!entry) return false;
+
+    const prev = entry.recentHashes;
+    if (prev.length > 0 && prev[prev.length - 1] === hash) {
+      entry.strikes++;
+    } else {
+      entry.strikes = 0;
+    }
+
+    entry.recentHashes.push(hash);
+    if (entry.recentHashes.length > 3) {
+      entry.recentHashes.shift();
+    }
+
+    return entry.strikes >= 2 && !entry.escalated;
+  }
+
+  /**
+   * Escalate session to next tier. Returns the new model/tier or null if already at max.
+   */
+  escalateSession(
+    sessionId: string,
+    tierConfigs: Record<string, { primary: string; fallback: string[] }>,
+  ): { model: string; tier: string } | null {
+    const entry = this.sessions.get(sessionId);
+    if (!entry) return null;
+
+    const TIER_ORDER = ["SIMPLE", "MEDIUM", "COMPLEX", "REASONING"];
+    const currentIdx = TIER_ORDER.indexOf(entry.tier);
+    if (currentIdx < 0 || currentIdx >= TIER_ORDER.length - 1) return null;
+
+    const nextTier = TIER_ORDER[currentIdx + 1];
+    const nextConfig = tierConfigs[nextTier];
+    if (!nextConfig) return null;
+
+    entry.model = nextConfig.primary;
+    entry.tier = nextTier;
+    entry.strikes = 0;
+    entry.escalated = true;
+
+    return { model: nextConfig.primary, tier: nextTier };
+  }
+
+  /**
    * Stop the cleanup interval.
    */
   close(): void {
@@ -203,4 +259,23 @@ export function deriveSessionId(
   // 8-char hex prefix of SHA-256 — short enough for logs, collision-resistant
   // enough for session tracking within a single gateway instance.
   return createHash("sha256").update(content).digest("hex").slice(0, 8);
+}
+
+/**
+ * Generate a short hash fingerprint from request content.
+ * Captures: last user message text + tool call names (if any).
+ * Normalizes whitespace to avoid false negatives from minor formatting diffs.
+ */
+export function hashRequestContent(
+  lastUserContent: string,
+  toolCallNames?: string[],
+): string {
+  const normalized = lastUserContent.replace(/\s+/g, " ").trim().slice(0, 500);
+  const toolSuffix = toolCallNames?.length
+    ? `|tools:${toolCallNames.sort().join(",")}`
+    : "";
+  return createHash("sha256")
+    .update(normalized + toolSuffix)
+    .digest("hex")
+    .slice(0, 12);
 }

@@ -1813,6 +1813,163 @@ async function proxyRequest(
         return;
       }
 
+      // --- /image command: generate an image via BlockRun image API ---
+      if (lastContent.startsWith("/image")) {
+        const imageArgs = lastContent.slice("/image".length).trim();
+
+        // Parse optional flags: /image --model dall-e-3 --size 1792x1024 a cute cat
+        let imageModel = "google/nano-banana";
+        let imageSize = "1024x1024";
+        let imagePrompt = imageArgs;
+
+        // Extract --model flag
+        const modelMatch = imageArgs.match(/--model\s+(\S+)/);
+        if (modelMatch) {
+          const raw = modelMatch[1];
+          // Resolve shorthand aliases
+          const IMAGE_MODEL_ALIASES: Record<string, string> = {
+            "dall-e-3": "openai/dall-e-3",
+            "dalle3": "openai/dall-e-3",
+            "dalle": "openai/dall-e-3",
+            "gpt-image": "openai/gpt-image-1",
+            "gpt-image-1": "openai/gpt-image-1",
+            "flux": "black-forest/flux-1.1-pro",
+            "flux-pro": "black-forest/flux-1.1-pro",
+            "banana": "google/nano-banana",
+            "nano-banana": "google/nano-banana",
+            "banana-pro": "google/nano-banana-pro",
+            "nano-banana-pro": "google/nano-banana-pro",
+          };
+          imageModel = IMAGE_MODEL_ALIASES[raw] ?? raw;
+          imagePrompt = imagePrompt.replace(/--model\s+\S+/, "").trim();
+        }
+
+        // Extract --size flag
+        const sizeMatch = imageArgs.match(/--size\s+(\d+x\d+)/);
+        if (sizeMatch) {
+          imageSize = sizeMatch[1];
+          imagePrompt = imagePrompt.replace(/--size\s+\d+x\d+/, "").trim();
+        }
+
+        if (!imagePrompt) {
+          const errorText = [
+            "Usage: /image <prompt>",
+            "",
+            "Options:",
+            "  --model <model>  Model to use (default: nano-banana)",
+            "  --size <WxH>     Image size (default: 1024x1024)",
+            "",
+            "Models:",
+            "  nano-banana       Google Gemini Flash — $0.05/image",
+            "  banana-pro        Google Gemini Pro — $0.10/image (up to 4K)",
+            "  dall-e-3          OpenAI DALL-E 3 — $0.04/image",
+            "  gpt-image         OpenAI GPT Image 1 — $0.02/image",
+            "  flux              Black Forest Flux 1.1 Pro — $0.04/image",
+            "",
+            "Examples:",
+            "  /image a cat wearing sunglasses",
+            "  /image --model dall-e-3 a futuristic city at sunset",
+            "  /image --model banana-pro --size 2048x2048 mountain landscape",
+          ].join("\n");
+
+          const completionId = `chatcmpl-image-${Date.now()}`;
+          const timestamp = Math.floor(Date.now() / 1000);
+          if (isStreaming) {
+            res.writeHead(200, {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            });
+            res.write(`data: ${JSON.stringify({ id: completionId, object: "chat.completion.chunk", created: timestamp, model: "clawrouter/image", choices: [{ index: 0, delta: { role: "assistant", content: errorText }, finish_reason: null }] })}\n\n`);
+            res.write(`data: ${JSON.stringify({ id: completionId, object: "chat.completion.chunk", created: timestamp, model: "clawrouter/image", choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`);
+            res.write("data: [DONE]\n\n");
+            res.end();
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({
+              id: completionId, object: "chat.completion", created: timestamp, model: "clawrouter/image",
+              choices: [{ index: 0, message: { role: "assistant", content: errorText }, finish_reason: "stop" }],
+              usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+            }));
+          }
+          console.log(`[ClawRouter] /image command → showing usage help`);
+          return;
+        }
+
+        // Call upstream image generation API
+        console.log(`[ClawRouter] /image command → ${imageModel} (${imageSize}): ${imagePrompt.slice(0, 80)}...`);
+        try {
+          const imageUpstreamUrl = `${apiBase}/v1/images/generations`;
+          const imageBody = JSON.stringify({ model: imageModel, prompt: imagePrompt, size: imageSize, n: 1 });
+          const imageResponse = await payFetch(imageUpstreamUrl, {
+            method: "POST",
+            headers: { "content-type": "application/json", "user-agent": USER_AGENT },
+            body: imageBody,
+          });
+
+          const imageResult = await imageResponse.json() as {
+            created?: number;
+            data?: Array<{ url?: string; revised_prompt?: string }>;
+            error?: string | { message?: string };
+          };
+
+          let responseText: string;
+          if (!imageResponse.ok || imageResult.error) {
+            const errMsg = typeof imageResult.error === "string"
+              ? imageResult.error
+              : (imageResult.error as { message?: string })?.message ?? `HTTP ${imageResponse.status}`;
+            responseText = `Image generation failed: ${errMsg}`;
+            console.log(`[ClawRouter] /image error: ${errMsg}`);
+          } else {
+            const images = imageResult.data ?? [];
+            if (images.length === 0) {
+              responseText = "Image generation returned no results.";
+            } else {
+              const lines: string[] = [];
+              for (const img of images) {
+                if (img.url) lines.push(`![Generated Image](${img.url})`);
+                if (img.revised_prompt) lines.push(`*Revised prompt: ${img.revised_prompt}*`);
+              }
+              lines.push("", `Model: ${imageModel} | Size: ${imageSize}`);
+              responseText = lines.join("\n");
+            }
+            console.log(`[ClawRouter] /image success: ${images.length} image(s) generated`);
+          }
+
+          // Return as synthetic chat completion
+          const completionId = `chatcmpl-image-${Date.now()}`;
+          const timestamp = Math.floor(Date.now() / 1000);
+          if (isStreaming) {
+            res.writeHead(200, {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            });
+            res.write(`data: ${JSON.stringify({ id: completionId, object: "chat.completion.chunk", created: timestamp, model: "clawrouter/image", choices: [{ index: 0, delta: { role: "assistant", content: responseText }, finish_reason: null }] })}\n\n`);
+            res.write(`data: ${JSON.stringify({ id: completionId, object: "chat.completion.chunk", created: timestamp, model: "clawrouter/image", choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`);
+            res.write("data: [DONE]\n\n");
+            res.end();
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({
+              id: completionId, object: "chat.completion", created: timestamp, model: "clawrouter/image",
+              choices: [{ index: 0, message: { role: "assistant", content: responseText }, finish_reason: "stop" }],
+              usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+            }));
+          }
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.error(`[ClawRouter] /image error: ${errMsg}`);
+          if (!res.headersSent) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({
+              error: { message: `Image generation failed: ${errMsg}`, type: "image_error" },
+            }));
+          }
+        }
+        return;
+      }
+
       // Force stream: false — BlockRun API doesn't support streaming yet
       // ClawRouter handles SSE heartbeat simulation for upstream compatibility
       if (parsed.stream === true) {
