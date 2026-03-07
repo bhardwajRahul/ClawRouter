@@ -104,29 +104,33 @@ const HEALTH_CHECK_TIMEOUT_MS = 2_000; // Timeout for checking existing proxy
 const RATE_LIMIT_COOLDOWN_MS = 60_000; // 60 seconds cooldown for rate-limited models
 const PORT_RETRY_ATTEMPTS = 5; // Max attempts to bind port (handles TIME_WAIT)
 const PORT_RETRY_DELAY_MS = 1_000; // Delay between retry attempts
-const BODY_READ_TIMEOUT_MS = 60_000; // 60 seconds for body stream to complete
+const MODEL_BODY_READ_TIMEOUT_MS = 300_000; // 5 minutes for model responses (reasoning models are slow)
+const ERROR_BODY_READ_TIMEOUT_MS = 30_000; // 30 seconds for error/partner body reads
 
 async function readBodyWithTimeout(
   body: ReadableStream<Uint8Array> | null,
-  timeoutMs: number = BODY_READ_TIMEOUT_MS,
+  timeoutMs: number = MODEL_BODY_READ_TIMEOUT_MS,
 ): Promise<Uint8Array[]> {
   if (!body) return [];
 
   const reader = body.getReader();
   const chunks: Uint8Array[] = [];
 
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     while (true) {
       const result = await Promise.race([
         reader.read(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Body read timeout")), timeoutMs),
-        ),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error("Body read timeout")), timeoutMs);
+        }),
       ]);
+      clearTimeout(timer);
       if (result.done) break;
       chunks.push(result.value);
     }
   } finally {
+    clearTimeout(timer);
     reader.releaseLock();
   }
 
@@ -304,6 +308,8 @@ function canWrite(res: ServerResponse): boolean {
  */
 function safeWrite(res: ServerResponse, data: string | Buffer): boolean {
   if (!canWrite(res)) {
+    const bytes = typeof data === "string" ? Buffer.byteLength(data) : data.length;
+    console.warn(`[ClawRouter] safeWrite: socket not writable, dropping ${bytes} bytes`);
     return false;
   }
   return res.write(data);
@@ -1087,7 +1093,7 @@ async function proxyPartnerRequest(
 
   // Stream response body
   if (upstream.body) {
-    const chunks = await readBodyWithTimeout(upstream.body);
+    const chunks = await readBodyWithTimeout(upstream.body, ERROR_BODY_READ_TIMEOUT_MS);
     for (const chunk of chunks) {
       safeWrite(res, Buffer.from(chunk));
     }
@@ -1751,7 +1757,7 @@ async function tryModelRequest(
     // Check for provider errors
     if (response.status !== 200) {
       // Clone response to read body without consuming it
-      const errorBodyChunks = await readBodyWithTimeout(response.body);
+      const errorBodyChunks = await readBodyWithTimeout(response.body, ERROR_BODY_READ_TIMEOUT_MS);
       const errorBody = Buffer.concat(errorBodyChunks).toString();
       const isProviderErr = isProviderError(response.status, errorBody);
 
@@ -1767,7 +1773,7 @@ async function tryModelRequest(
     const contentType = response.headers.get("content-type") || "";
     if (contentType.includes("json") || contentType.includes("text")) {
       try {
-        const clonedChunks = await readBodyWithTimeout(response.clone().body);
+        const clonedChunks = await readBodyWithTimeout(response.clone().body, ERROR_BODY_READ_TIMEOUT_MS);
         const responseBody = Buffer.concat(clonedChunks).toString();
         const degradedReason = detectDegradedSuccessResponse(responseBody);
         if (degradedReason) {
