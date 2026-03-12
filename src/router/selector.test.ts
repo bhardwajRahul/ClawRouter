@@ -40,16 +40,16 @@ describe("selectModel", () => {
 
 describe("filterByToolCalling", () => {
   const supportsToolCalling = (modelId: string) =>
-    !["xai/grok-code-fast-1", "nvidia/gpt-oss-120b"].includes(modelId);
+    !["minimax/minimax-m2.5", "nvidia/gpt-oss-120b"].includes(modelId);
 
   it("removes models without tool calling support when request has tools", () => {
-    const models = ["moonshot/kimi-k2.5", "xai/grok-code-fast-1", "deepseek/deepseek-chat"];
+    const models = ["moonshot/kimi-k2.5", "minimax/minimax-m2.5", "deepseek/deepseek-chat"];
     const filtered = filterByToolCalling(models, true, supportsToolCalling);
     expect(filtered).toEqual(["moonshot/kimi-k2.5", "deepseek/deepseek-chat"]);
   });
 
   it("keeps all models when request has no tools", () => {
-    const models = ["moonshot/kimi-k2.5", "xai/grok-code-fast-1", "nvidia/gpt-oss-120b"];
+    const models = ["moonshot/kimi-k2.5", "minimax/minimax-m2.5", "nvidia/gpt-oss-120b"];
     const filtered = filterByToolCalling(models, false, supportsToolCalling);
     expect(filtered).toEqual(models);
   });
@@ -61,7 +61,7 @@ describe("filterByToolCalling", () => {
   });
 
   it("returns full list unchanged when no models support tool calling, to avoid empty chain", () => {
-    const models = ["xai/grok-code-fast-1", "nvidia/gpt-oss-120b"];
+    const models = ["minimax/minimax-m2.5", "nvidia/gpt-oss-120b"];
     const filtered = filterByToolCalling(models, true, supportsToolCalling);
     expect(filtered).toEqual(models);
   });

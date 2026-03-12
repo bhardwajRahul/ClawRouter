@@ -1043,15 +1043,17 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     SIMPLE: {
       primary: "moonshot/kimi-k2.5", // $0.60/$3.00 - best quality/price for simple tasks
       fallback: [
+        "google/gemini-2.5-flash", // 60% retention (best), fast growth (+800%)
         "google/gemini-2.5-flash-lite", // 1M context, ultra cheap ($0.10/$0.40)
+        "deepseek/deepseek-chat", // 41% retention
         "nvidia/gpt-oss-120b", // FREE fallback
-        "deepseek/deepseek-chat",
       ],
     },
     MEDIUM: {
       primary: "moonshot/kimi-k2.5", // $0.50/$2.40 - strong tool use, proper function call format
       fallback: [
-        "deepseek/deepseek-chat",
+        "deepseek/deepseek-chat", // 41% retention
+        "google/gemini-2.5-flash", // 60% retention, cheap fast model
         "google/gemini-2.5-flash-lite", // 1M context, ultra cheap ($0.10/$0.40)
         "xai/grok-4-1-fast-non-reasoning", // Upgraded Grok 4.1
       ],
@@ -1059,6 +1061,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     COMPLEX: {
       primary: "google/gemini-3.1-pro", // Newest Gemini 3.1 - upgraded from 3.0
       fallback: [
+        "google/gemini-2.5-flash", // 60% retention, cheap failsafe before expensive models
         "google/gemini-2.5-flash-lite", // CRITICAL: 1M context, ultra-cheap failsafe ($0.10/$0.40)
         "google/gemini-3-pro-preview", // 3.0 fallback
         "google/gemini-2.5-pro",
@@ -1083,11 +1086,11 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
   ecoTiers: {
     SIMPLE: {
       primary: "nvidia/gpt-oss-120b", // FREE! $0.00/$0.00
-      fallback: ["google/gemini-2.5-flash-lite", "deepseek/deepseek-chat"],
+      fallback: ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash", "deepseek/deepseek-chat"],
     },
     MEDIUM: {
       primary: "google/gemini-2.5-flash-lite", // $0.10/$0.40 - cheapest capable with 1M context
-      fallback: ["deepseek/deepseek-chat", "nvidia/gpt-oss-120b"],
+      fallback: ["google/gemini-2.5-flash", "deepseek/deepseek-chat", "nvidia/gpt-oss-120b"],
     },
     COMPLEX: {
       primary: "google/gemini-2.5-flash-lite", // $0.10/$0.40 - 1M context handles complexity
@@ -1105,6 +1108,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
     SIMPLE: {
       primary: "moonshot/kimi-k2.5", // $0.60/$3.00 - good for simple coding
       fallback: [
+        "google/gemini-2.5-flash", // 60% retention, fast growth
         "anthropic/claude-haiku-4.5",
         "google/gemini-2.5-flash-lite",
         "deepseek/deepseek-chat",
@@ -1114,6 +1118,7 @@ export const DEFAULT_ROUTING_CONFIG: RoutingConfig = {
       primary: "openai/gpt-5.2-codex", // $2.50/$10 - strong coding for medium tasks
       fallback: [
         "moonshot/kimi-k2.5",
+        "google/gemini-2.5-flash", // 60% retention, good coding capability
         "google/gemini-2.5-pro",
         "xai/grok-4-0709",
         "anthropic/claude-sonnet-4.6",

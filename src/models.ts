@@ -69,7 +69,7 @@ export const MODEL_ALIASES: Record<string, string> = {
   // xAI
   grok: "xai/grok-3",
   "grok-fast": "xai/grok-4-fast-reasoning",
-  "grok-code": "xai/grok-code-fast-1",
+  "grok-code": "deepseek/deepseek-chat", // was grok-code-fast-1, delisted due to poor retention
 
   // NVIDIA
   nvidia: "nvidia/gpt-oss-120b",
@@ -596,18 +596,8 @@ export const BLOCKRUN_MODELS: BlockRunModel[] = [
     maxOutput: 16384,
     toolCalling: true,
   },
-  {
-    id: "xai/grok-code-fast-1",
-    name: "Grok Code Fast",
-    version: "1",
-    inputPrice: 0.2,
-    outputPrice: 1.5,
-    contextWindow: 131072,
-    maxOutput: 16384,
-    // toolCalling intentionally omitted: outputs tool calls as plain text JSON,
-    // not OpenAI-compatible structured function calls. Will be skipped when
-    // request has tools to prevent the "talking to itself" bug.
-  },
+  // xai/grok-code-fast-1 delisted 2026-03-12: poor retention (coding users churn),
+  // no structured tool calling, alias "grok-code" redirected to deepseek-chat
   {
     id: "xai/grok-4-0709",
     name: "Grok 4 (0709)",
