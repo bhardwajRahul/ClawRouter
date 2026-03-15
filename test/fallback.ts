@@ -32,6 +32,21 @@ async function startMockServer(): Promise<{ port: number; close: () => Promise<v
 
       console.log(`  [MockAPI] Request for model: ${model}`);
 
+      // Simulate an invalid explicit model name that should be surfaced to the caller
+      // instead of being silently converted into a free-model success.
+      if (model.startsWith("invalid/")) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            error: {
+              message: `Unknown model: ${model}. Available models: moonshot/kimi-k2.5, nvidia/gpt-oss-120b`,
+              type: "provider_error",
+            },
+          }),
+        );
+        return;
+      }
+
       // Simulate provider error for models in failModels list (or all models)
       if (failAllModels || failModels.includes(model)) {
         console.log(`  [MockAPI] Simulating billing error for ${model}`);
@@ -145,6 +160,31 @@ async function runTests() {
     const content = data.choices?.[0]?.message?.content || "";
     assert(content.startsWith("Response from "), `Response from routed model: ${content}`);
     assert(modelCalls.length === 1, `Only 1 model called: ${modelCalls.join(", ")}`);
+  }
+
+  // Test 1b: Free profile should only call the free model
+  {
+    console.log("\n--- Test 1b: Free profile uses free model directly ---");
+    modelCalls.length = 0;
+    failModels = [];
+    failAllModels = false;
+
+    const res = await fetch(`${proxy.baseUrl}/v1/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "blockrun/free",
+        messages: [{ role: "user", content: uniqueMessage("Free profile hello") }],
+        max_tokens: 50,
+      }),
+    });
+
+    assert(res.ok, `Free profile succeeds: ${res.status}`);
+    assert(modelCalls.length === 1, `Only 1 model called: ${modelCalls.join(", ")}`);
+    assert(
+      modelCalls[0] === "nvidia/gpt-oss-120b",
+      `Free profile forwarded free model: ${modelCalls[0]}`,
+    );
   }
 
   // Probe reasoning route once so fallback tests adapt to current config.
@@ -341,6 +381,36 @@ async function runTests() {
       `Primary canonical model used: ${modelCalls[0]}`,
     );
     assert(modelCalls[1] === "nvidia/gpt-oss-120b", `Fallback model used: ${modelCalls[1]}`);
+  }
+
+  // Test 8: Invalid explicit model should surface the error (no free fallback)
+  {
+    console.log("\n--- Test 8: Invalid explicit model returns error ---");
+    modelCalls.length = 0;
+    failModels = [];
+    failAllModels = false;
+
+    const res = await fetch(`${proxy.baseUrl}/v1/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "invalid/nonexistent-model",
+        messages: [{ role: "user", content: uniqueMessage("Invalid model should error") }],
+        max_tokens: 50,
+      }),
+    });
+
+    assert(!res.ok, `Invalid explicit model returns error: ${res.status}`);
+    const data = (await res.json()) as { error?: { message?: string } };
+    assert(
+      (data.error?.message || "").includes("Unknown model"),
+      `Error surfaces unknown model message: ${data.error?.message}`,
+    );
+    assert(modelCalls.length === 1, `Only invalid model was tried: ${modelCalls.join(", ")}`);
+    assert(
+      modelCalls[0] === "invalid/nonexistent-model",
+      `Did not fall back away from invalid model: ${modelCalls[0]}`,
+    );
   }
 
   // Cleanup

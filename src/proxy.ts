@@ -100,6 +100,12 @@ const ROUTING_PROFILES = new Set([
   "premium",
 ]);
 const FREE_MODEL = "nvidia/gpt-oss-120b"; // Free model for empty wallet fallback
+const FREE_TIER_CONFIGS: Record<Tier, { primary: string; fallback: string[] }> = {
+  SIMPLE: { primary: FREE_MODEL, fallback: [] },
+  MEDIUM: { primary: FREE_MODEL, fallback: [] },
+  COMPLEX: { primary: FREE_MODEL, fallback: [] },
+  REASONING: { primary: FREE_MODEL, fallback: [] },
+};
 let freeRequestCount = 0;
 const MAX_MESSAGES = 200; // BlockRun API limit - truncate older messages if exceeded
 const CONTEXT_LIMIT_KB = 5120; // Server-side limit: 5MB in KB
@@ -2856,6 +2862,7 @@ async function proxyRequest(
             costEstimate: 0,
             baselineCost: 0,
             savings: 1,
+            tierConfigs: FREE_TIER_CONFIGS,
           };
         } else {
           // eco/auto/premium - use tier routing
@@ -3400,6 +3407,17 @@ async function proxyRequest(
 
       // If it's a provider error and not the last attempt, try next model
       if (result.isProviderError && !isLastAttempt) {
+        const isExplicitModelError = !routingDecision;
+        const isUnknownExplicitModel =
+          isExplicitModelError &&
+          /unknown.*model|invalid.*model/i.test(result.errorBody || "");
+        if (isUnknownExplicitModel) {
+          console.log(
+            `[ClawRouter] Explicit model error from ${tryModel}, not falling back: ${result.errorBody?.slice(0, 100)}`,
+          );
+          break;
+        }
+
         // Track 429 rate limits to deprioritize this model for future requests
         if (result.errorStatus === 429) {
           markRateLimited(tryModel);
