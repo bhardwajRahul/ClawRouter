@@ -53,6 +53,7 @@ export const MODEL_ALIASES: Record<string, string> = {
 
   // DeepSeek
   deepseek: "deepseek/deepseek-chat",
+  "deepseek-chat": "deepseek/deepseek-chat",
   reasoner: "deepseek/deepseek-reasoner",
 
   // Kimi / Moonshot

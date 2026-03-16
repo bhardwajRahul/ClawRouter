@@ -272,7 +272,9 @@ function injectModelsConfig(logger: { info: (msg: string) => void }): void {
     "anthropic/claude-sonnet-4.6",
     "anthropic/claude-opus-4.6",
     "anthropic/claude-haiku-4.5",
+    "openai/gpt-5.4",
     "openai/gpt-5.3",
+    "openai/gpt-5.3-codex",
     "openai/gpt-4o",
     "openai/o3",
     "google/gemini-3.1-pro",
@@ -554,6 +556,17 @@ async function createWalletCommand(): Promise<OpenClawPluginCommandDefinition> {
     acceptsArgs: true,
     requireAuth: true,
     handler: async (ctx: PluginCommandContext) => {
+      // Only handle /wallet when the active model is a BlockRun model.
+      // Otherwise, return undefined text so OpenClaw can show its native
+      // provider wallet (e.g. Codex usage on a Codex LLM).
+      const primary = String(
+        (ctx.config as Record<string, unknown> & { agents?: { defaults?: { model?: { primary?: string } } } })
+          ?.agents?.defaults?.model?.primary ?? "",
+      );
+      if (!primary.startsWith("blockrun/")) {
+        return {};
+      }
+
       const subcommand = ctx.args?.trim().toLowerCase() || "status";
 
       // Read wallet key if it exists
