@@ -6,6 +6,8 @@
 
 ## The $248/Day Problem
 
+![The Autopsy of an Overrun — token volume compounds exponentially in agentic workloads, reaching 11.3M input tokens in a single hour](assets/248-day-problem.png)
+
 From [openclaw/openclaw#3181](https://github.com/openclaw/openclaw/issues/3181):
 
 > *"We ended up at $248/day before we caught it. Heartbeat on Opus 4.6 with a large context. The dedup fix reduced trigger rate, but there's nothing bounding the run itself."*
