@@ -1664,7 +1664,16 @@ export async function startProxy(options: ProxyOptions): Promise<ProxyHandle> {
           "Content-Type": "application/json",
           "Cache-Control": "no-cache",
         });
-        res.end(JSON.stringify(stats, null, 2));
+        res.end(
+          JSON.stringify(
+            {
+              ...stats,
+              providerErrors: Object.fromEntries(perProviderErrors),
+            },
+            null,
+            2,
+          ),
+        );
       } catch (err) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(
